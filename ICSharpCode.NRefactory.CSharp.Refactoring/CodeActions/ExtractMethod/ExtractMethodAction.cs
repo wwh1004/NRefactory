@@ -205,7 +205,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring.ExtractMethod
 					var argumentExpression = invocation.Arguments.OfType<DirectionExpression>().First(a => a.FieldDirection == FieldDirection.Out);
 					argumentExpression.Remove();
 					method.ReturnType = parameterToTransform.Type.Clone();
-					var argumentDecl = new VariableDeclarationStatement(parameterToTransform.Type.Clone(),parameterToTransform.Name);
+					var argumentDecl = new VariableDeclarationStatement(null, parameterToTransform.Type.Clone(),parameterToTransform.Name);
 					method.Body.InsertChildBefore(method.Body.First(),argumentDecl,BlockStatement.StatementRole);
 					method.Body.Add(new ReturnStatement (new IdentifierExpression (parameterToTransform.Name)));
 				}
@@ -223,12 +223,12 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring.ExtractMethod
 								continue;
 							if (variable == generatedReturnVariable)
 								continue;
-							script.InsertBefore (statements [0], new VariableDeclarationStatement (context.CreateShortType(variable.Type), variable.Name));
+							script.InsertBefore (statements [0], new VariableDeclarationStatement (null, context.CreateShortType(variable.Type), variable.Name));
 						}
 						Statement invocationStatement;
 
 						if (generatedReturnVariable != null) {
-							invocationStatement = new VariableDeclarationStatement (new SimpleType ("var"), generatedReturnVariable.Name, invocation);
+							invocationStatement = new VariableDeclarationStatement (null, new SimpleType ("var"), generatedReturnVariable.Name, invocation);
 						} else if(transformParameterToReturn) {
 							invocationStatement = new AssignmentExpression(new IdentifierExpression(parameterToTransform.Name), invocation);
 						} else {

@@ -140,6 +140,7 @@
     <Compile Include="Semantics\TypeResolveResult.cs" />
     <Compile Include="Semantics\UnknownMemberResolveResult.cs" />
     <Compile Include="TextLocation.cs" />
+    <Compile Include="TextTokenType.cs" />
     <Compile Include="TypeSystem\Accessibility.cs" />
     <Compile Include="TypeSystem\AnonymousType.cs" />
     <Compile Include="TypeSystem\ArrayType.cs" />
@@ -295,11 +296,17 @@
     <Compile Include="PatternMatching\AnyNodeOrNull.cs" />
     <Compile Include="Editor\ITextPasteHandler.cs" />
   </ItemGroup>
-  <ItemGroup>
+   <ItemGroup>
     <Folder Include="Completion\" />
     <Folder Include="TypeSystem\" />
     <Folder Include="Utils\CompositeFormatStringParser\" />
     <Folder Include="Refactoring\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\dnlib\src\dnlib.csproj">
+      <Project>{FDFC1237-143F-4919-8318-4926901F4639}</Project>
+      <Name>dnlib</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\doc\Pattern Matching.html">

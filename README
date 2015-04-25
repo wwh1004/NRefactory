@@ -1,4 +1,20 @@
-﻿Overview of the NRefactory library:
+﻿This is a modified NRefactory for use by dnSpy.
+
+It improves debugging and syntax highlighting.
+
+All my changes are released under the GPLv3 license. See the file COPYING for more info. Copyright (C) 2015 de4dot@gmail.com .
+
+The old dnSpy NRefactory that was merged into this fork, was originally ported by Ki.
+
+
+
+
+
+Original README follows:
+
+
+
+Overview of the NRefactory library:
 
 Introductory documentation:
 	 http://www.codeproject.com/Articles/408663/Using-NRefactory-for-analyzing-Csharp-code

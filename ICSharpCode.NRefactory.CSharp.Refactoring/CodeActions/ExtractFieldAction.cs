@@ -71,7 +71,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 					FieldDeclaration field = new FieldDeclaration(){
 						Modifiers = isStatic ? Modifiers.Static : Modifiers.None,
 						ReturnType = extractedType,
-						Variables = { new VariableInitializer(name) }
+						Variables = { new VariableInitializer(null, name) }
 					};
 					AstNode nodeToRemove = RemoveDeclaration(varInit) ? varInit.Parent : type;
 					s.Remove(nodeToRemove, true);
@@ -92,7 +92,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 				var type = (idntf.GetPrevNode() as AstType).Clone();
 				FieldDeclaration field = new FieldDeclaration(){
 					ReturnType = type.Clone(),
-					Variables = { new VariableInitializer(idntf.Name) }
+					Variables = { new VariableInitializer(null, idntf.Name) }
 				};
 				yield return new CodeAction(context.TranslateString("Assign to new field"), s=>{
 					s.InsertWithCursor(context.TranslateString("Insert new field"),Script.InsertPosition.Before,field);

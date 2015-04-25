@@ -106,6 +106,14 @@ namespace ICSharpCode.NRefactory
 				annotations = cloneable.Clone();
 		}
 
+		public void AddAnnotationsFrom(AbstractAnnotatable other)
+		{
+			if (other == null)
+				return;
+			foreach (var ann in other.Annotations)
+				AddAnnotation(ann);
+		}
+		
 		sealed class AnnotationList : List<object>, ICloneable
 		{
 			// There are two uses for this custom list type:
@@ -205,6 +213,25 @@ namespace ICSharpCode.NRefactory
 				}
 			} else {
 				return annotations as T;
+			}
+		}
+		
+		public T? AnnotationVT<T> () where T: struct
+		{
+			object annotations = this.annotations;
+			AnnotationList list = annotations as AnnotationList;
+			if (list != null) {
+				lock (list) {
+					foreach (object obj in list) {
+						if (obj is T)
+							return (T)obj;
+					}
+					return null;
+				}
+			} else {
+				if (annotations is T)
+					return (T)annotations;
+				return null;
 			}
 		}
 		

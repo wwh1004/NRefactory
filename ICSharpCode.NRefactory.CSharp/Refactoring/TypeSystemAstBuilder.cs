@@ -391,7 +391,9 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 			SimpleType st = attr.Type as SimpleType;
 			MemberType mt = attr.Type as MemberType;
 			if (st != null && st.Identifier.EndsWith("Attribute", StringComparison.Ordinal)) {
-				st.Identifier = st.Identifier.Substring(0, st.Identifier.Length - 9);
+				var id = Identifier.Create(st.Identifier.Substring(0, st.Identifier.Length - 9));
+				id.AddAnnotationsFrom(st.IdentifierToken);
+				st.IdentifierToken = id;
 			} else if (mt != null && mt.MemberName.EndsWith("Attribute", StringComparison.Ordinal)) {
 				mt.MemberName = mt.MemberName.Substring(0, mt.MemberName.Length - 9);
 			}
@@ -399,7 +401,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 				attr.Arguments.Add(ConvertConstantValue(arg));
 			}
 			foreach (var pair in attribute.NamedArguments) {
-				attr.Arguments.Add(new NamedExpression(pair.Key.Name, ConvertConstantValue(pair.Value)));
+				attr.Arguments.Add(new NamedExpression(pair.Key.Name, ConvertConstantValue(pair.Value), null));
 			}
 			return attr;
 		}
@@ -474,7 +476,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 			TypeCode enumBaseTypeCode = ReflectionHelper.GetTypeCode(enumDefinition.EnumUnderlyingType);
 			foreach (IField field in enumDefinition.Fields) {
 				if (field.IsConst && object.Equals(CSharpPrimitiveCast.Cast(TypeCode.Int64, field.ConstantValue, false), val))
-					return ConvertType(type).Member(field.Name);
+					return ConvertType(type).Member(field.Name, TextTokenType.LiteralField);
 			}
 			if (IsFlagsEnum(enumDefinition)) {
 				long enumValue = val;
@@ -502,7 +504,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 						continue;	// skip None enum value
 
 					if ((fieldValue & enumValue) == fieldValue) {
-						var fieldExpression = ConvertType(type).Member(field.Name);
+						var fieldExpression = ConvertType(type).Member(field.Name, TextTokenType.LiteralField);
 						if (expr == null)
 							expr = fieldExpression;
 						else
@@ -511,7 +513,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 						enumValue &= ~fieldValue;
 					}
 					if ((fieldValue & negatedEnumValue) == fieldValue) {
-						var fieldExpression = ConvertType(type).Member(field.Name);
+						var fieldExpression = ConvertType(type).Member(field.Name, TextTokenType.LiteralField);
 						if (negatedExpr == null)
 							negatedExpr = fieldExpression;
 						else
@@ -733,7 +735,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 			Expression initializer = null;
 			if (field.IsConst && this.ShowConstantValues)
 				initializer = ConvertConstantValue(field.Type, field.ConstantValue);
-			decl.Variables.Add(new VariableInitializer(field.Name, initializer));
+			decl.Variables.Add(new VariableInitializer(null, field.Name, initializer));
 			return decl;
 		}
 		
@@ -797,7 +799,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 				EventDeclaration decl = new EventDeclaration();
 				decl.Modifiers = GetMemberModifiers(ev);
 				decl.ReturnType = ConvertType(ev.ReturnType);
-				decl.Variables.Add(new VariableInitializer(ev.Name));
+				decl.Variables.Add(new VariableInitializer(null, ev.Name));
 				return decl;
 			}
 		}
@@ -968,7 +970,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 			Expression initializer = null;
 			if (v.IsConst)
 				initializer = ConvertConstantValue(v.Type, v.ConstantValue);
-			decl.Variables.Add(new VariableInitializer(v.Name, initializer));
+			decl.Variables.Add(new VariableInitializer(null, v.Name, initializer));
 			return decl;
 		}
 		#endregion

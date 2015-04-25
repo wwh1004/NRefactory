@@ -497,12 +497,12 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 				this.stringWriter = stringWriter;
 			}
 			
-			public override void WriteIdentifier (Identifier identifier)
+			public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
 			{
 				int startOffset = stringWriter.GetStringBuilder ().Length;
 				int endOffset = startOffset + (identifier.Name ?? "").Length + (identifier.IsVerbatim ? 1 : 0);
 				NewSegments.Add(new KeyValuePair<AstNode, Segment>(identifier, new Segment(startOffset, endOffset - startOffset)));
-				base.WriteIdentifier (identifier);
+				base.WriteIdentifier (identifier, tokenType);
 			}
 			
 			public override void StartNode (AstNode node)

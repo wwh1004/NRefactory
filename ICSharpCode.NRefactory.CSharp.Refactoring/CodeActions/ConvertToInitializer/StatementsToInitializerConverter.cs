@@ -71,7 +71,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 
 			Convert(statements);
 			statements = ReplacementNodeHelper.GetReplacedNodes(accessPaths [mainAccessPath]);
-			return new VariableInitializer(mainAccessPath.RootName, accessPaths [mainAccessPath]);
+			return new VariableInitializer(null, mainAccessPath.RootName, accessPaths [mainAccessPath]);
 		}
 
 		public AssignmentExpression ConvertToInitializer(AssignmentExpression assignmentExpression, ref IList<AstNode> statements)
@@ -271,7 +271,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 			AddToInitializer(parentInitializer, comments.ToArray());
 			comments.Clear();
 
-			AddToInitializer(parentInitializer, new NamedExpression(member.Name, initializer));
+			AddToInitializer(parentInitializer, new NamedExpression(member.Name, initializer, null));
 			ReplacementNodeHelper.AddReplacementAnnotation(initializer, node);
 			accessPaths [leftPath] = initializer;
 			return true;
@@ -376,7 +376,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 
 			var parentInitializer = accessPaths [parentPath];
 			var initializer = new ArrayInitializerExpression();
-			var namedExpression = new NamedExpression(path.MemberPath [path.MemberPath.Count - 1].Name, initializer);
+			var namedExpression = new NamedExpression(path.MemberPath [path.MemberPath.Count - 1].Name, initializer, null);
 			AddToInitializer(parentInitializer, namedExpression);
 			accessPaths [path] = initializer;
 			return true;

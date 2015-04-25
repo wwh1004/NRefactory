@@ -59,17 +59,17 @@ namespace ICSharpCode.NRefactory.CSharp
 			}
 			set {
 				var arr = value.Split('.');
-				NamespaceName = ConstructType(arr, arr.Length - 1);
+				NamespaceName = ConstructType(arr, arr.Length - 1, TextTokenType.NamespacePart);
 			}
 		}
 
-		static AstType ConstructType(string[] arr, int i)
+		static AstType ConstructType(string[] arr, int i, TextTokenType tokenType)
 		{
 			if (i < 0 || i >= arr.Length)
 				throw new ArgumentOutOfRangeException("i");
 			if (i == 0)
-				return new SimpleType(arr[i]);
-			return new MemberType(ConstructType(arr, i - 1), arr[i]);
+				return new SimpleType(arr[i]).WithAnnotation(tokenType);
+			return new MemberType(ConstructType(arr, i - 1, TextTokenType.NamespacePart), arr[i]).WithAnnotation(tokenType);
 		}
 
 		/// <summary>

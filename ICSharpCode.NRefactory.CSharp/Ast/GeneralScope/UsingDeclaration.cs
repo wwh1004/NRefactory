@@ -90,7 +90,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		public UsingDeclaration (string nameSpace)
 		{
-			AddChild (AstType.Create (nameSpace), ImportRole);
+			AddChild (AstType.Create (nameSpace, TextTokenType.NamespacePart), ImportRole);
 		}
 		
 		public UsingDeclaration (AstType import)

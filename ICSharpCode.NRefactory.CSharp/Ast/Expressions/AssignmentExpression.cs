@@ -204,9 +204,9 @@ namespace ICSharpCode.NRefactory.CSharp
 		}
 
 		#region Builder methods
-		public override MemberReferenceExpression Member(string memberName)
+		public override MemberReferenceExpression Member(string memberName, object memberAnnotation)
 		{
-			return new MemberReferenceExpression { Target = this, MemberName = memberName };
+			return new MemberReferenceExpression { Target = this, MemberName = memberName }.WithAnnotation(memberAnnotation);
 		}
 
 		public override IndexerExpression Indexer(IEnumerable<Expression> arguments)
@@ -225,12 +225,13 @@ namespace ICSharpCode.NRefactory.CSharp
 			return expr;
 		}
 
-		public override InvocationExpression Invoke(string methodName, IEnumerable<AstType> typeArguments, IEnumerable<Expression> arguments)
+		public override InvocationExpression Invoke(object annotation, string methodName, IEnumerable<AstType> typeArguments, IEnumerable<Expression> arguments)
 		{
 			InvocationExpression ie = new InvocationExpression();
 			MemberReferenceExpression mre = new MemberReferenceExpression();
 			mre.Target = new ParenthesizedExpression(this);
 			mre.MemberName = methodName;
+			mre.MemberNameToken.AddAnnotation(annotation ?? TextTokenType.InstanceMethod);
 			mre.TypeArguments.AddRange(typeArguments);
 			ie.Target = mre;
 			ie.Arguments.AddRange(arguments);

@@ -112,42 +112,42 @@ namespace ICSharpCode.NRefactory.CSharp
 			else if (symbol is IMember)
 				WriteMemberDeclarationName((IMember)symbol, writer, formattingPolicy);
 			else
-				writer.WriteIdentifier(Identifier.Create(symbol.Name));
+				writer.WriteIdentifier(Identifier.Create(symbol.Name), TextTokenType.Text);
 			
 			if ((ConversionFlags & ConversionFlags.ShowParameterList) == ConversionFlags.ShowParameterList && HasParameters(symbol)) {
-				writer.WriteToken(symbol.SymbolKind == SymbolKind.Indexer ? Roles.LBracket : Roles.LPar, symbol.SymbolKind == SymbolKind.Indexer ? "[" : "(");
+				writer.WriteTokenOperator(symbol.SymbolKind == SymbolKind.Indexer ? Roles.LBracket : Roles.LPar, symbol.SymbolKind == SymbolKind.Indexer ? "[" : "(");
 				bool first = true;
 				foreach (var param in node.GetChildrenByRole(Roles.Parameter)) {
 					if (first) {
 						first = false;
 					} else {
-						writer.WriteToken(Roles.Comma, ",");
+						writer.WriteTokenOperator(Roles.Comma, ",");
 						writer.Space();
 					}
 					param.AcceptVisitor(new CSharpOutputVisitor(writer, formattingPolicy));
 				}
-				writer.WriteToken(symbol.SymbolKind == SymbolKind.Indexer ? Roles.RBracket : Roles.RPar, symbol.SymbolKind == SymbolKind.Indexer ? "]" : ")");
+				writer.WriteTokenOperator(symbol.SymbolKind == SymbolKind.Indexer ? Roles.RBracket : Roles.RPar, symbol.SymbolKind == SymbolKind.Indexer ? "]" : ")");
 			}
 			
 			if ((ConversionFlags & ConversionFlags.ShowBody) == ConversionFlags.ShowBody && !(node is TypeDeclaration)) {
 				IProperty property = symbol as IProperty;
 				if (property != null) {
 					writer.Space();
-					writer.WriteToken(Roles.LBrace, "{");
+					writer.WriteTokenBrace(Roles.LBrace, "{");
 					writer.Space();
 					if (property.CanGet) {
 						writer.WriteKeyword(PropertyDeclaration.GetKeywordRole, "get");
-						writer.WriteToken(Roles.Semicolon, ";");
+						writer.WriteTokenOperator(Roles.Semicolon, ";");
 						writer.Space();
 					}
 					if (property.CanSet) {
 						writer.WriteKeyword(PropertyDeclaration.SetKeywordRole, "set");
-						writer.WriteToken(Roles.Semicolon, ";");
+						writer.WriteTokenOperator(Roles.Semicolon, ";");
 						writer.Space();
 					}
-					writer.WriteToken(Roles.RBrace, "}");
+					writer.WriteTokenBrace(Roles.RBrace, "}");
 				} else {
-					writer.WriteToken(Roles.Semicolon, ";");
+					writer.WriteTokenOperator(Roles.Semicolon, ";");
 				}
 			}
 		}
@@ -185,14 +185,14 @@ namespace ICSharpCode.NRefactory.CSharp
 			EntityDeclaration node = astBuilder.ConvertEntity(typeDef);
 			if (typeDef.DeclaringTypeDefinition != null) {
 				WriteTypeDeclarationName(typeDef.DeclaringTypeDefinition, writer, formattingPolicy);
-				writer.WriteToken(Roles.Dot, ".");
+				writer.WriteTokenOperator(Roles.Dot, ".");
 			} else if ((ConversionFlags & ConversionFlags.UseFullyQualifiedEntityNames) == ConversionFlags.UseFullyQualifiedEntityNames) {
 				if (!string.IsNullOrEmpty(typeDef.Namespace)) {
 					WriteQualifiedName(typeDef.Namespace, writer, formattingPolicy);
-					writer.WriteToken(Roles.Dot, ".");
+					writer.WriteTokenOperator(Roles.Dot, ".");
 				}
 			}
-			writer.WriteIdentifier(node.NameToken);
+			writer.WriteIdentifier(node.NameToken, TextTokenType.Text);
 			if ((ConversionFlags & ConversionFlags.ShowTypeParameterList) == ConversionFlags.ShowTypeParameterList) {
 				var outputVisitor = new CSharpOutputVisitor(writer, formattingPolicy);
 				outputVisitor.WriteTypeParameters(node.GetChildrenByRole(Roles.TypeParameter));
@@ -205,7 +205,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			EntityDeclaration node = astBuilder.ConvertEntity(member);
 			if ((ConversionFlags & ConversionFlags.ShowDeclaringType) == ConversionFlags.ShowDeclaringType) {
 				ConvertType(member.DeclaringType, writer, formattingPolicy);
-				writer.WriteToken(Roles.Dot, ".");
+				writer.WriteTokenOperator(Roles.Dot, ".");
 			}
 			switch (member.SymbolKind) {
 				case SymbolKind.Indexer:
@@ -215,7 +215,7 @@ namespace ICSharpCode.NRefactory.CSharp
 					WriteQualifiedName(member.DeclaringType.Name, writer, formattingPolicy);
 					break;
 				case SymbolKind.Destructor:
-					writer.WriteToken(DestructorDeclaration.TildeRole, "~");
+					writer.WriteTokenOperator(DestructorDeclaration.TildeRole, "~");
 					WriteQualifiedName(member.DeclaringType.Name, writer, formattingPolicy);
 					break;
 				case SymbolKind.Operator:
@@ -239,14 +239,14 @@ namespace ICSharpCode.NRefactory.CSharp
 							writer.Space();
 							var operatorType = OperatorDeclaration.GetOperatorType(member.Name);
 							if (operatorType.HasValue)
-								writer.WriteToken(OperatorDeclaration.GetRole(operatorType.Value), OperatorDeclaration.GetToken(operatorType.Value));
+								writer.WriteToken(OperatorDeclaration.GetRole(operatorType.Value), OperatorDeclaration.GetToken(operatorType.Value), TextTokenType.Text);
 							else
-								writer.WriteIdentifier(node.NameToken);
+								writer.WriteIdentifier(node.NameToken, TextTokenType.Text);
 							break;
 					}
 					break;
 				default:
-					writer.WriteIdentifier(Identifier.Create(member.Name));
+					writer.WriteIdentifier(Identifier.Create(member.Name), TextTokenType.Text);
 					break;
 			}
 			if ((ConversionFlags & ConversionFlags.ShowTypeParameterList) == ConversionFlags.ShowTypeParameterList && member.SymbolKind == SymbolKind.Method) {
@@ -267,7 +267,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		void WriteQualifiedName(string name, TokenWriter writer, CSharpFormattingOptions formattingPolicy)
 		{
-			var node = AstType.Create(name);
+			var node = AstType.Create(name, TextTokenType.Text);
 			var outputVisitor = new CSharpOutputVisitor(writer, formattingPolicy);
 			node.AcceptVisitor(outputVisitor);
 		}

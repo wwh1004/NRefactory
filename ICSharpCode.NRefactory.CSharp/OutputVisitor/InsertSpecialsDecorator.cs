@@ -58,16 +58,16 @@ namespace ICSharpCode.NRefactory.CSharp
 			base.WriteKeyword(role, keyword);
 		}
 		
-		public override void WriteIdentifier(Identifier identifier)
+		public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
 		{
 			WriteSpecialsUpToRole(identifier.Role ?? Roles.Identifier);
-			base.WriteIdentifier(identifier);
+			base.WriteIdentifier(identifier, tokenType);
 		}
 		
-		public override void WriteToken(Role role, string token)
+		public override void WriteToken(Role role, string token, TextTokenType tokenType)
 		{
 			WriteSpecialsUpToRole(role);
-			base.WriteToken(role, token);
+			base.WriteToken(role, token, tokenType);
 		}
 		
 		public override void NewLine()

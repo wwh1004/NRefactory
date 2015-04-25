@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace ICSharpCode.NRefactory.CSharp
@@ -29,7 +30,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		/// <summary>
 		/// Writes an identifier.
 		/// </summary>
-		public abstract void WriteIdentifier(Identifier identifier);
+		public abstract void WriteIdentifier(Identifier identifier, TextTokenType tokenType);
 		
 		/// <summary>
 		/// Writes a keyword to the output.
@@ -39,12 +40,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		/// <summary>
 		/// Writes a token to the output.
 		/// </summary>
-		public abstract void WriteToken(Role role, string token);
+		public abstract void WriteToken(Role role, string token, TextTokenType tokenType);
 		
 		/// <summary>
 		/// Writes a primitive/literal value
 		/// </summary>
-		public abstract void WritePrimitiveValue(object value, string literalValue = null);
+		public abstract void WritePrimitiveValue(object value, TextTokenType? tokenType = null, string literalValue = null);
 		
 		public abstract void WritePrimitiveType(string type);
 		
@@ -72,6 +73,44 @@ namespace ICSharpCode.NRefactory.CSharp
 			if (!(writer is ILocatable))
 				throw new InvalidOperationException("writer does not provide locations!");
 			return new InsertSpecialsDecorator(new InsertRequiredSpacesDecorator(new InsertMissingTokensDecorator(writer, (ILocatable)writer)));
+		}
+
+		public virtual void DebugStart(AstNode node, TextLocation? start)
+		{
+		}
+
+		public virtual void DebugHidden(AstNode hiddenNode)
+		{
+		}
+
+		public virtual void DebugExpression(AstNode node)
+		{
+		}
+
+		public virtual void DebugEnd(AstNode node, TextLocation? end)
+		{
+		}
+
+		// Don't use Location prop since it's used by ILocatable. We want that whoever can provide
+		// this value can do it so we can't check the writer to see if it implements ILocatable
+		public virtual TextLocation? GetLocation()
+		{
+			return null;
+		}
+
+		public void WriteTokenOperator(Role tokenRole, string token)
+		{
+			WriteToken(tokenRole, token, TextTokenType.Operator);
+		}
+
+		public void WriteTokenBrace(Role tokenRole, string token)
+		{
+			WriteToken(tokenRole, token, TextTokenType.Brace);
+		}
+
+		public void WriteTokenNumber(Role tokenRole, string token)
+		{
+			WriteToken(tokenRole, token, TextTokenType.Number);
 		}
 	}
 	
@@ -101,9 +140,9 @@ namespace ICSharpCode.NRefactory.CSharp
 			decoratedWriter.EndNode(node);
 		}
 		
-		public override void WriteIdentifier(Identifier identifier)
+		public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
 		{
-			decoratedWriter.WriteIdentifier(identifier);
+			decoratedWriter.WriteIdentifier(identifier, tokenType);
 		}
 		
 		public override void WriteKeyword(Role role, string keyword)
@@ -111,14 +150,14 @@ namespace ICSharpCode.NRefactory.CSharp
 			decoratedWriter.WriteKeyword(role, keyword);
 		}
 		
-		public override void WriteToken(Role role, string token)
+		public override void WriteToken(Role role, string token, TextTokenType tokenType)
 		{
-			decoratedWriter.WriteToken(role, token);
+			decoratedWriter.WriteToken(role, token, tokenType);
 		}
 		
-		public override void WritePrimitiveValue(object value, string literalValue = null)
+		public override void WritePrimitiveValue(object value, TextTokenType? tokenType = null, string literalValue = null)
 		{
-			decoratedWriter.WritePrimitiveValue(value, literalValue);
+			decoratedWriter.WritePrimitiveValue(value, tokenType, literalValue);
 		}
 		
 		public override void WritePrimitiveType(string type)
@@ -154,6 +193,31 @@ namespace ICSharpCode.NRefactory.CSharp
 		public override void WritePreProcessorDirective(PreProcessorDirectiveType type, string argument)
 		{
 			decoratedWriter.WritePreProcessorDirective(type, argument);
+		}
+
+		public override void DebugStart(AstNode node, TextLocation? start)
+		{
+			decoratedWriter.DebugStart(node, start);
+		}
+
+		public override void DebugHidden(AstNode hiddenNode)
+		{
+			decoratedWriter.DebugHidden(hiddenNode);
+		}
+
+		public override void DebugExpression(AstNode node)
+		{
+			decoratedWriter.DebugExpression(node);
+		}
+
+		public override void DebugEnd(AstNode node, TextLocation? end)
+		{
+			decoratedWriter.DebugEnd(node, end);
+		}
+
+		public override TextLocation? GetLocation()
+		{
+			return decoratedWriter.GetLocation();
 		}
 	}
 }

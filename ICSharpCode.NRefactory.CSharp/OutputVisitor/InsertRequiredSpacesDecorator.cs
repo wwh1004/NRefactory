@@ -54,7 +54,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		{
 		}
 		
-		public override void WriteIdentifier(Identifier identifier)
+		public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
 		{
 			if (identifier.IsVerbatim || CSharpOutputVisitor.IsKeyword(identifier.Name, identifier)) {
 				if (lastWritten == LastWritten.KeywordOrIdentifier) {
@@ -65,7 +65,7 @@ namespace ICSharpCode.NRefactory.CSharp
 				// this space is strictly required, so we directly call the formatter
 				base.Space();
 			}
-			base.WriteIdentifier(identifier);
+			base.WriteIdentifier(identifier, tokenType);
 			lastWritten = LastWritten.KeywordOrIdentifier;
 		}
 		
@@ -78,7 +78,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			lastWritten = LastWritten.KeywordOrIdentifier;
 		}
 		
-		public override void WriteToken(Role role, string token)
+		public override void WriteToken(Role role, string token, TextTokenType tokenType)
 		{
 			// Avoid that two +, - or ? tokens are combined into a ++, -- or ?? token.
 			// Note that we don't need to handle tokens like = because there's no valid
@@ -93,7 +93,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			    lastWritten == LastWritten.Division && token[0] == '*') {
 				base.Space();
 			}
-			base.WriteToken(role, token);
+			base.WriteToken(role, token, tokenType);
 			if (token == "+") {
 				lastWritten = LastWritten.Plus;
 			} else if (token == "-") {
@@ -138,9 +138,9 @@ namespace ICSharpCode.NRefactory.CSharp
 			lastWritten = LastWritten.Whitespace;
 		}
 		
-		public override void WritePrimitiveValue(object value, string literalValue = null)
+		public override void WritePrimitiveValue(object value, TextTokenType? tokenType = null, string literalValue = null)
 		{
-			base.WritePrimitiveValue(value, literalValue);
+			base.WritePrimitiveValue(value, tokenType, literalValue);
 			if (value == null || value is bool)
 				return;
 			if (value is string) {

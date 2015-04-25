@@ -269,9 +269,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		void WriteIdentifier(Identifier identifier)
 		{
-			var tt = identifier.AnnotationVT<TextTokenType>();
-			Debug.Assert(tt != null);
-			WriteIdentifier(identifier, tt ?? TextTokenType.Text);
+			WriteIdentifier(identifier, identifier.AnnotationVT<TextTokenType>() ?? TextTokenType.Text);
 		}
 
 		void WriteIdentifier(Identifier identifier, TextTokenType tokenType)

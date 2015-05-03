@@ -458,6 +458,9 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 				else
 					return new DefaultValueExpression(ConvertType(type));
 			} else if (type.Kind == TypeKind.Enum) {
+				TypeCode c = Type.GetTypeCode(constantValue.GetType());
+				if (c < TypeCode.Char || c > TypeCode.Double)
+					return new PrimitiveExpression(constantValue);
 				return ConvertEnumValue(type, (long)CSharpPrimitiveCast.Cast(TypeCode.Int64, constantValue, false));
 			} else {
 				return new PrimitiveExpression(constantValue);
@@ -475,6 +478,9 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 			ITypeDefinition enumDefinition = type.GetDefinition();
 			TypeCode enumBaseTypeCode = ReflectionHelper.GetTypeCode(enumDefinition.EnumUnderlyingType);
 			foreach (IField field in enumDefinition.Fields) {
+				TypeCode c = field.ConstantValue == null ? TypeCode.Empty : Type.GetTypeCode(field.ConstantValue.GetType());
+				if (c < TypeCode.Char || c > TypeCode.Double)
+					continue;
 				if (field.IsConst && object.Equals(CSharpPrimitiveCast.Cast(TypeCode.Int64, field.ConstantValue, false), val))
 					return ConvertType(type).Member(field.Name, TextTokenType.LiteralField);
 			}
@@ -499,6 +505,9 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 				}
 				Expression negatedExpr = null;
 				foreach (IField field in enumDefinition.Fields.Where(fld => fld.IsConst)) {
+					TypeCode c = field.ConstantValue == null ? TypeCode.Empty : Type.GetTypeCode(field.ConstantValue.GetType());
+					if (c < TypeCode.Char || c > TypeCode.Double)
+						continue;
 					long fieldValue = (long)CSharpPrimitiveCast.Cast(TypeCode.Int64, field.ConstantValue, false);
 					if (fieldValue == 0)
 						continue;	// skip None enum value
@@ -531,6 +540,8 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 					return new UnaryOperatorExpression(UnaryOperatorType.BitNot, negatedExpr);
 				}
 			}
+			if (enumBaseTypeCode < TypeCode.Char || enumBaseTypeCode > TypeCode.Double)
+				return new PrimitiveExpression(val).CastTo(ConvertType(type));
 			return new PrimitiveExpression(CSharpPrimitiveCast.Cast(enumBaseTypeCode, val, false)).CastTo(ConvertType(type));
 		}
 		

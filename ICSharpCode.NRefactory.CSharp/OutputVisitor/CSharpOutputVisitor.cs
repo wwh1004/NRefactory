@@ -934,7 +934,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			StartNode(memberReferenceExpression);
 			memberReferenceExpression.Target.AcceptVisitor(this);
 			WriteToken(Roles.Dot);
-			WriteIdentifier(memberReferenceExpression.MemberNameToken, TextTokenHelper.GetTextTokenType(memberReferenceExpression.MemberNameToken.Annotation<object>()));
+			WriteIdentifier(memberReferenceExpression.MemberNameToken, TextTokenHelper.GetTextTokenType(memberReferenceExpression.MemberNameToken.Annotation<object>() ?? memberReferenceExpression.Annotation<object>()));
 			WriteTypeArguments(memberReferenceExpression.TypeArguments);
 			EndNode(memberReferenceExpression);
 		}

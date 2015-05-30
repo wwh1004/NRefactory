@@ -345,8 +345,10 @@ namespace ICSharpCode.NRefactory
 				var mr = (IMethod)r;
 				if (mr.MethodSig == null)
 					return TextTokenType.InstanceMethod;
+				var md = mr.ResolveMethodDef();
+				if (md != null && md.IsConstructor)
+					return GetTextTokenType(md.DeclaringType);
 				if (!mr.MethodSig.HasThis) {
-					var md = mr.ResolveMethodDef();
 					if (md != null && md.CustomAttributes.Find("System.Runtime.CompilerServices.ExtensionAttribute") != null)
 						return TextTokenType.ExtensionMethod;
 					return TextTokenType.StaticMethod;

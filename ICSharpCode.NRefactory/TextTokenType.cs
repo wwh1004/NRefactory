@@ -279,6 +279,21 @@ namespace ICSharpCode.NRefactory
 		/// </summary>
 		XmlDocToolTipText,
 
+		/// <summary>
+		/// Assembly
+		/// </summary>
+		Assembly,
+
+		/// <summary>
+		/// Assembly (executable)
+		/// </summary>
+		AssemblyExe,
+
+		/// <summary>
+		/// Module
+		/// </summary>
+		Module,
+
 		// If you add a new one, also update ColorType
 
 		/// <summary>

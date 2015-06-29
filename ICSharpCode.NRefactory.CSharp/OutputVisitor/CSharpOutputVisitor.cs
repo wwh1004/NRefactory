@@ -1297,7 +1297,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			StartNode(attributeSection);
 			WriteToken(Roles.LBracket);
 			if (!string.IsNullOrEmpty(attributeSection.AttributeTarget)) {
-				WriteIdentifier(attributeSection.AttributeTargetToken);
+				WriteKeyword(attributeSection.AttributeTarget, Roles.Identifier);
 				WriteToken(Roles.Colon);
 				Space();
 			}
@@ -1872,6 +1872,16 @@ namespace ICSharpCode.NRefactory.CSharp
 				RPar();
 			}
 			DebugEnd(catchClause);
+			if (!catchClause.Condition.IsNull) {
+				Space();
+				WriteKeyword(CatchClause.WhenKeywordRole);
+				Space(policy.SpaceBeforeIfParentheses);
+				LPar();
+				Space(policy.SpacesWithinIfParentheses);
+				catchClause.Condition.AcceptVisitor(this);
+				Space(policy.SpacesWithinIfParentheses);
+				RPar();
+			}
 			catchClause.Body.AcceptVisitor(this);
 			EndNode(catchClause);
 		}

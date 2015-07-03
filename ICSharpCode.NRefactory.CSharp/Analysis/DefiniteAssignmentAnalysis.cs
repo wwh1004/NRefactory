@@ -195,7 +195,7 @@ namespace ICSharpCode.NRefactory.CSharp.Analysis
 			this.analyzedRangeEnd = endIndex;
 		}
 		
-		public void Analyze(string variable, DefiniteAssignmentStatus initialStatus = DefiniteAssignmentStatus.PotentiallyAssigned, CancellationToken cancellationToken = default(CancellationToken))
+		public void Analyze(string variable, CancellationToken cancellationToken, DefiniteAssignmentStatus initialStatus = DefiniteAssignmentStatus.PotentiallyAssigned)
 		{
 			this.analysisCancellationToken = cancellationToken;
 			this.variableName = variable;
@@ -210,7 +210,13 @@ namespace ICSharpCode.NRefactory.CSharp.Analysis
 				
 				ChangeNodeStatus(allNodes[analyzedRangeStart], initialStatus);
 				// Iterate as long as the input status of some nodes is changing:
+				int count = 0;
+				const int HACK_POLL_COUNT = 0x00200000;
 				while (nodesWithModifiedInput.Count > 0) {
+					if (count++ >= HACK_POLL_COUNT) {
+						this.analysisCancellationToken.ThrowIfCancellationRequested();
+						count = 0;
+					}
 					DefiniteAssignmentNode node = nodesWithModifiedInput.Dequeue();
 					DefiniteAssignmentStatus inputStatus = DefiniteAssignmentStatus.CodeUnreachable;
 					foreach (ControlFlowEdge edge in node.Incoming) {

@@ -1985,6 +1985,18 @@ namespace ICSharpCode.NRefactory.CSharp
 			bool isDefault = accessor.Body.IsNull;
 			if (isDefault)
 				DebugStart(accessor);
+
+			// Writer doesn't write the comment before accessor if nothing has been printed yet.
+			// The following code works with our added comments.
+			if (accessor.Attributes.Count == 0 && !accessor.ModifierTokens.Any()) {
+				foreach (var child in accessor.Children) {
+					var cmt = child as Comment;
+					if (cmt == null)
+						break;
+					cmt.AcceptVisitor(this);
+				}
+			}
+
 			if (accessor.Role == PropertyDeclaration.GetterRole) {
 				WriteKeywordIdentifier(PropertyDeclaration.GetKeywordRole);
 			} else if (accessor.Role == PropertyDeclaration.SetterRole) {
@@ -2045,6 +2057,18 @@ namespace ICSharpCode.NRefactory.CSharp
 			StartNode(destructorDeclaration);
 			WriteAttributes(destructorDeclaration.Attributes);
 			WriteModifiers(destructorDeclaration.ModifierTokens);
+
+			// Writer doesn't write the comment before destructorDeclaration if nothing has been printed yet.
+			// The following code works with our added comments.
+			if (destructorDeclaration.Attributes.Count == 0 && !destructorDeclaration.ModifierTokens.Any()) {
+				foreach (var child in destructorDeclaration.Children) {
+					var cmt = child as Comment;
+					if (cmt == null)
+						break;
+					cmt.AcceptVisitor(this);
+				}
+			}
+
 			WriteToken(DestructorDeclaration.TildeRole);
 			TypeDeclaration type = destructorDeclaration.Parent as TypeDeclaration;
 			var method = destructorDeclaration.Annotation<dnlib.DotNet.MethodDef>();

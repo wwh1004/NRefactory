@@ -149,7 +149,7 @@ namespace ICSharpCode.NRefactory.Documentation
 					} else {
 						string redirectionTarget = GetRedirectionTarget(fileName, xmlReader.GetAttribute("redirect"));
 						if (redirectionTarget != null) {
-							Debug.WriteLine("XmlDoc " + fileName + " is redirecting to " + redirectionTarget);
+							//Debug.WriteLine("XmlDoc " + fileName + " is redirecting to " + redirectionTarget);
 							using (FileStream redirectedFs = new FileStream(redirectionTarget, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)) {
 								using (XmlTextReader redirectedXmlReader = new XmlTextReader(redirectedFs)) {
 									redirectedXmlReader.XmlResolver = null; // no DTD resolving
@@ -200,17 +200,17 @@ namespace ICSharpCode.NRefactory.Documentation
 			string currentCulture = System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
 			string localizedXmlDocFile = GetLocalizedName(xmlFileName, currentCulture);
 			
-			Debug.WriteLine("Try find XMLDoc @" + localizedXmlDocFile);
+			//Debug.WriteLine("Try find XMLDoc @" + localizedXmlDocFile);
 			if (File.Exists(localizedXmlDocFile)) {
 				return localizedXmlDocFile;
 			}
-			Debug.WriteLine("Try find XMLDoc @" + xmlFileName);
+			//Debug.WriteLine("Try find XMLDoc @" + xmlFileName);
 			if (File.Exists(xmlFileName)) {
 				return xmlFileName;
 			}
 			if (currentCulture != "en") {
 				string englishXmlDocFile = GetLocalizedName(xmlFileName, "en");
-				Debug.WriteLine("Try find XMLDoc @" + englishXmlDocFile);
+				//Debug.WriteLine("Try find XMLDoc @" + englishXmlDocFile);
 				if (File.Exists(englishXmlDocFile)) {
 					return englishXmlDocFile;
 				}

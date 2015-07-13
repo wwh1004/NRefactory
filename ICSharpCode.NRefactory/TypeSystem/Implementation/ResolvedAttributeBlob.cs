@@ -138,7 +138,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 				return;
 			BlobReader reader = new BlobReader(blob, context.CurrentAssembly);
 			if (reader.ReadUInt16() != 0x0001) {
-				Debug.WriteLine("Unknown blob prolog");
+				//Debug.WriteLine("Unknown blob prolog");
 				return;
 			}
 			foreach (var ctorParameter in ctorParameterTypes.Resolve(context)) {
@@ -148,8 +148,8 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 					arg = reader.ReadFixedArg (ctorParameter);
 					positionalArguments.Add(arg);
 					isError = arg.IsError;
-				} catch (Exception ex) {
-					Debug.WriteLine("Crash during blob decoding: " + ex);
+				} catch (Exception) {
+					//Debug.WriteLine("Crash during blob decoding: " + ex);
 					isError = true;
 				}
 				if (isError) {
@@ -168,8 +168,8 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 					if (namedArg.Key != null)
 						namedArguments.Add(namedArg);
 				}
-			} catch (Exception ex) {
-				Debug.WriteLine("Crash during blob decoding: " + ex);
+			} catch (Exception) {
+				//Debug.WriteLine("Crash during blob decoding: " + ex);
 			}
 		}
 	}

@@ -1334,7 +1334,7 @@ namespace ICSharpCode.NRefactory.Utils
 		[Conditional("DEBUG_SERIALIZER")]
 		static void Log(string format, params object[] args)
 		{
-			Debug.WriteLine(format, args);
+			//Debug.WriteLine(format, args);
 		}
 	}
 	

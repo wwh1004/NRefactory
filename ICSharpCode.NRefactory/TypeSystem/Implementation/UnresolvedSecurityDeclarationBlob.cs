@@ -78,9 +78,9 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 			IAttribute[] attributes = new IAttribute[attributeCount];
 			try {
 				ReadSecurityBlob(reader, attributes, context, securityActionRR);
-			} catch (NotSupportedException ex) {
+			} catch (NotSupportedException) {
 				// ignore invalid blobs
-				Debug.WriteLine(ex.ToString());
+				//Debug.WriteLine(ex.ToString());
 			}
 			for (int i = 0; i < attributes.Length; i++) {
 				if (attributes[i] == null)

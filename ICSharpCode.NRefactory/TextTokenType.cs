@@ -294,6 +294,21 @@ namespace ICSharpCode.NRefactory
 		/// </summary>
 		Module,
 
+		/// <summary>
+		/// Part of a directory
+		/// </summary>
+		DirectoryPart,
+
+		/// <summary>
+		/// Filename without extension
+		/// </summary>
+		FileNameNoExtension,
+
+		/// <summary>
+		/// File extension
+		/// </summary>
+		FileExtension,
+
 		// If you add a new one, also update ColorType
 
 		/// <summary>

@@ -38,7 +38,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 #endif
 		internal static void WriteLine(string text)
 		{
-			Debug.WriteLine(text);
+			//Debug.WriteLine(text);
 		}
 		
 #if __MonoCS__
@@ -48,7 +48,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 #endif
 		internal static void WriteLine(string format, params object[] args)
 		{
-			Debug.WriteLine(format, args);
+			//Debug.WriteLine(format, args);
 		}
 		
 #if __MonoCS__
@@ -61,11 +61,11 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 			#if DEBUG
 			T[] arr = lines.ToArray();
 			if (arr.Length == 0) {
-				Debug.WriteLine(text + "<empty collection>");
+				//Debug.WriteLine(text + "<empty collection>");
 			} else {
-				Debug.WriteLine(text + (arr[0] != null ? arr[0].ToString() : "<null>"));
+				//Debug.WriteLine(text + (arr[0] != null ? arr[0].ToString() : "<null>"));
 				for (int i = 1; i < arr.Length; i++) {
-					Debug.WriteLine(new string(' ', text.Length) + (arr[i] != null ? arr[i].ToString() : "<null>"));
+					//Debug.WriteLine(new string(' ', text.Length) + (arr[i] != null ? arr[i].ToString() : "<null>"));
 				}
 			}
 			#endif
@@ -78,7 +78,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 #endif
 		public static void Indent()
 		{
-			Debug.Indent();
+			//Debug.Indent();
 		}
 		
 #if __MonoCS__
@@ -88,7 +88,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 #endif
 		public static void Unindent()
 		{
-			Debug.Unindent();
+			//Debug.Unindent();
 		}
 	}
 }

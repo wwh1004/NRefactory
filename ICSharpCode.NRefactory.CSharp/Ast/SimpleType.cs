@@ -36,6 +36,8 @@ namespace ICSharpCode.NRefactory.CSharp
 {
 	public class SimpleType : AstType
 	{
+		public static readonly string DummyTypeGenericParam = "DummyTypeGenericParam";
+
 		#region Null
 		public new static readonly SimpleType Null = new NullSimpleType ();
 		

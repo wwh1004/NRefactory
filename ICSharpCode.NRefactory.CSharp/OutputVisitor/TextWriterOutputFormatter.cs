@@ -59,7 +59,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
 		{
 			WriteIndentation();
-			if (identifier.IsVerbatim || CSharpOutputVisitor.IsKeyword(identifier.Name, identifier)) {
+			if (tokenType != TextTokenType.Keyword && (identifier.IsVerbatim || CSharpOutputVisitor.IsKeyword(identifier.Name, identifier))) {
 				textWriter.Write('@');
 				column++;
 			}

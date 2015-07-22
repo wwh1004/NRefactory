@@ -2340,7 +2340,11 @@ namespace ICSharpCode.NRefactory.CSharp
 		public void VisitSimpleType(SimpleType simpleType)
 		{
 			StartNode(simpleType);
-			WriteIdentifier(simpleType.IdentifierToken, TextTokenHelper.GetTextTokenType(simpleType.IdentifierToken.Annotation<object>() ?? simpleType.Annotation<object>()));
+			if (simpleType.Identifier.Length == 0 && SimpleType.DummyTypeGenericParam.Equals(simpleType.Annotation<string>(), StringComparison.Ordinal)) {
+				// It's the empty string. Don't call WriteIdentifier() since it will write "<<EMPTY_NAME>>"
+			}
+			else
+				WriteIdentifier(simpleType.IdentifierToken, TextTokenHelper.GetTextTokenType(simpleType.IdentifierToken.Annotation<object>() ?? simpleType.Annotation<object>()));
 			WriteTypeArguments(simpleType.TypeArguments);
 			EndNode(simpleType);
 		}

@@ -121,14 +121,14 @@ namespace ICSharpCode.NRefactory.CSharp
 			lastWritten = LastWritten.Whitespace;
 		}
 		
-		public override void WriteComment(CommentType commentType, string content)
+		public override void WriteComment(CommentType commentType, string content, CommentReference[] refs)
 		{
 			if (lastWritten == LastWritten.Division) {
 				// When there's a comment starting after a division operator
 				// "1.0 / /*comment*/a", then we need to insert a space in front of the comment.
 				base.Space();
 			}
-			base.WriteComment(commentType, content);
+			base.WriteComment(commentType, content, refs);
 			lastWritten = LastWritten.Whitespace;
 		}
 		

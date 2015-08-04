@@ -86,7 +86,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			for (AstNode pos = start; pos != end; pos = pos.NextSibling) {
 				if (pos.Role == Roles.Comment) {
 					var node = (Comment)pos;
-					base.WriteComment(node.CommentType, node.Content);
+					base.WriteComment(node.CommentType, node.Content, node.References);
 				}
 				// see CSharpOutputVisitor.VisitNewLine()
 				//				if (pos.Role == Roles.NewLine) {

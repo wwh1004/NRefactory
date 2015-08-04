@@ -203,6 +203,7 @@
     <Compile Include="Ast\TypeMembers\ParameterDeclaration.cs" />
     <Compile Include="Ast\TypeMembers\PropertyDeclaration.cs" />
     <Compile Include="Ast\TypeMembers\VariableInitializer.cs" />
+    <Compile Include="CommentReference.cs" />
     <Compile Include="CSharpProjectContent.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Formatter\CSharpFormattingOptions.cs" />
@@ -418,8 +419,5 @@
   <ItemGroup>
     <None Include="Parser\mcs\cs-parser.jay" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PatternMatching\" />
-    <Folder Include="IndentEngine\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

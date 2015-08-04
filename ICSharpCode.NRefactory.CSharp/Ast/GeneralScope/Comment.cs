@@ -101,6 +101,8 @@ namespace ICSharpCode.NRefactory.CSharp
 				return endLocation;
 			}
 		}
+
+		public CommentReference[] References { get; set; }
 		
 		public Comment (string content, CommentType type = CommentType.SingleLine)
 		{

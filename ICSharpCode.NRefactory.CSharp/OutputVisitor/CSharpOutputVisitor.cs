@@ -2400,7 +2400,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		public void VisitComment(Comment comment)
 		{
 			writer.StartNode(comment);
-			writer.WriteComment(comment.CommentType, comment.Content);
+			writer.WriteComment(comment.CommentType, comment.Content, comment.References);
 			writer.EndNode(comment);
 		}
 

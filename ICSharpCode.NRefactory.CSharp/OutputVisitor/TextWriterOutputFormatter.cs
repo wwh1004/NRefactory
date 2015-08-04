@@ -121,7 +121,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			indentation--;
 		}
 		
-		public override void WriteComment(CommentType commentType, string content)
+		public override void WriteComment(CommentType commentType, string content, CommentReference[] refs)
 		{
 			WriteIndentation();
 			switch (commentType) {

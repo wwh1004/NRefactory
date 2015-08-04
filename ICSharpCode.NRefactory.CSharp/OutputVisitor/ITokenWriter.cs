@@ -54,7 +54,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		public abstract void Unindent();
 		public abstract void NewLine();
 		
-		public abstract void WriteComment(CommentType commentType, string content);
+		public abstract void WriteComment(CommentType commentType, string content, CommentReference[] refs);
 		public abstract void WritePreProcessorDirective(PreProcessorDirectiveType type, string argument);
 		
 		public static TokenWriter Create(TextWriter writer, string indentation = "\t")
@@ -185,9 +185,9 @@ namespace ICSharpCode.NRefactory.CSharp
 			decoratedWriter.NewLine();
 		}
 		
-		public override void WriteComment(CommentType commentType, string content)
+		public override void WriteComment(CommentType commentType, string content, CommentReference[] refs)
 		{
-			decoratedWriter.WriteComment(commentType, content);
+			decoratedWriter.WriteComment(commentType, content, refs);
 		}
 		
 		public override void WritePreProcessorDirective(PreProcessorDirectiveType type, string argument)

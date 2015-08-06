@@ -20,10 +20,8 @@
 using System;
 using dnlib.DotNet;
 
-namespace ICSharpCode.NRefactory
-{
-	public enum TextTokenType : byte
-	{
+namespace ICSharpCode.NRefactory {
+	public enum TextTokenType : byte {
 		/// <summary>
 		/// default text (in text editor)
 		/// </summary>
@@ -318,10 +316,8 @@ namespace ICSharpCode.NRefactory
 	}
 
 	[CLSCompliant(false)]
-	public static class TextTokenHelper
-	{
-		public static TextTokenType GetTextTokenType(TypeDef td)
-		{
+	public static class TextTokenHelper {
+		public static TextTokenType GetTextTokenType(TypeDef td) {
 			if (td == null)
 				return TextTokenType.Text;
 
@@ -342,8 +338,7 @@ namespace ICSharpCode.NRefactory
 			return TextTokenType.Type;
 		}
 
-		public static TextTokenType GetTextTokenType(TypeRef tr)
-		{
+		public static TextTokenType GetTextTokenType(TypeRef tr) {
 			if (tr == null)
 				return TextTokenType.Text;
 
@@ -354,8 +349,7 @@ namespace ICSharpCode.NRefactory
 			return TextTokenType.Type;
 		}
 
-		public static TextTokenType GetTextTokenType(IMemberRef r)
-		{
+		public static TextTokenType GetTextTokenType(IMemberRef r) {
 			if (r == null)
 				return TextTokenType.Text;
 
@@ -421,16 +415,14 @@ namespace ICSharpCode.NRefactory
 			return TextTokenType.Text;
 		}
 
-		public static TextTokenType GetTextTokenType(GenericSig sig)
-		{
+		public static TextTokenType GetTextTokenType(GenericSig sig) {
 			if (sig == null)
 				return TextTokenType.Text;
 
 			return sig.IsMethodVar ? TextTokenType.MethodGenericParameter : TextTokenType.TypeGenericParameter;
 		}
 
-		public static TextTokenType GetTextTokenType(GenericParam gp)
-		{
+		public static TextTokenType GetTextTokenType(GenericParam gp) {
 			if (gp == null)
 				return TextTokenType.Text;
 
@@ -443,8 +435,7 @@ namespace ICSharpCode.NRefactory
 			return TextTokenType.TypeGenericParameter;
 		}
 
-		static TextTokenType GetTextTokenType(MethodDef method, TextTokenType staticValue, TextTokenType instanceValue)
-		{
+		static TextTokenType GetTextTokenType(MethodDef method, TextTokenType staticValue, TextTokenType instanceValue) {
 			if (method == null)
 				return instanceValue;
 			if (method.IsStatic)
@@ -452,16 +443,14 @@ namespace ICSharpCode.NRefactory
 			return instanceValue;
 		}
 
-		public static TextTokenType GetTextTokenType(ExportedType et)
-		{
+		public static TextTokenType GetTextTokenType(ExportedType et) {
 			if (et == null)
 				return TextTokenType.Text;
 
 			return GetTextTokenType(et.ToTypeRef());
 		}
 
-		public static TextTokenType GetTextTokenType(TypeSig ts)
-		{
+		public static TextTokenType GetTextTokenType(TypeSig ts) {
 			ts = ts.RemovePinnedAndModifiers();
 			if (ts == null)
 				return TextTokenType.Text;
@@ -477,8 +466,7 @@ namespace ICSharpCode.NRefactory
 			return TextTokenType.Text;
 		}
 
-		public static TextTokenType GetTextTokenType(object op)
-		{
+		public static TextTokenType GetTextTokenType(object op) {
 			if (op == null)
 				return TextTokenType.Text;
 
@@ -526,8 +514,7 @@ namespace ICSharpCode.NRefactory
 			return TextTokenType.Text;
 		}
 
-		public static TextTokenType GetTextTokenTypeFromLangToken(this string text)
-		{
+		public static TextTokenType GetTextTokenTypeFromLangToken(this string text) {
 			if (string.IsNullOrEmpty(text))
 				return TextTokenType.Text;
 			if (char.IsLetter(text[0]))
@@ -537,8 +524,7 @@ namespace ICSharpCode.NRefactory
 			return TextTokenType.Operator;
 		}
 
-		public static TextTokenType GetTextTokenType(Type type)
-		{
+		public static TextTokenType GetTextTokenType(Type type) {
 			if (type == null)
 				return TextTokenType.Text;
 

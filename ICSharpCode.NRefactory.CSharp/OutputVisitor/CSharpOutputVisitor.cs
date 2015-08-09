@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using ICSharpCode.NRefactory.PatternMatching;
 using ICSharpCode.NRefactory.TypeSystem;
 using ICSharpCode.NRefactory.CSharp;
+using System.Threading;
 
 namespace ICSharpCode.NRefactory.CSharp
 {
@@ -37,6 +38,8 @@ namespace ICSharpCode.NRefactory.CSharp
 		readonly TokenWriter writer;
 		readonly CSharpFormattingOptions policy;
 		readonly Stack<AstNode> containerStack = new Stack<AstNode> ();
+		CancellationToken cancellationToken;
+		const int CANCEL_CHECK_LOOP_COUNT = 100;
 		
 		public CSharpOutputVisitor (TextWriter textWriter, CSharpFormattingOptions formattingPolicy)
 		{
@@ -48,9 +51,10 @@ namespace ICSharpCode.NRefactory.CSharp
 			}
 			this.writer = TokenWriter.Create(textWriter);
 			this.policy = formattingPolicy;
+			this.cancellationToken = new CancellationToken();
 		}
 		
-		public CSharpOutputVisitor (TokenWriter writer, CSharpFormattingOptions formattingPolicy)
+		public CSharpOutputVisitor (TokenWriter writer, CSharpFormattingOptions formattingPolicy, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			if (writer == null) {
 				throw new ArgumentNullException ("writer");
@@ -60,6 +64,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			}
 			this.writer = new InsertSpecialsDecorator(new InsertRequiredSpacesDecorator(writer));
 			this.policy = formattingPolicy;
+			this.cancellationToken = cancellationToken;
 		}
 		
 		#region StartNode/EndNode
@@ -168,7 +173,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		void WriteCommaSeparatedList(IEnumerable<AstNode> list)
 		{
 			bool isFirst = true;
+			int count = 0;
 			foreach (AstNode node in list) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (isFirst) {
 					isFirst = false;
 				} else {
@@ -501,7 +511,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		void WriteModifiers(IEnumerable<CSharpModifierToken> modifierTokens)
 		{
+			int count = 0;
 			foreach (CSharpModifierToken modifier in modifierTokens) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				modifier.AcceptVisitor(this);
 			}
 		}
@@ -509,7 +524,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		void WriteQualifiedIdentifier(IEnumerable<Identifier> identifiers)
 		{
 			bool first = true;
+			int count = 0;
 			foreach (Identifier ident in identifiers) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (first) {
 					first = false;
 				} else {
@@ -547,7 +567,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		void WriteAttributes(IEnumerable<AttributeSection> attributes)
 		{
+			int count = 0;
 			foreach (AttributeSection attr in attributes) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				attr.AcceptVisitor(this);
 			}
 		}
@@ -615,7 +640,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			if (arrayCreateExpression.Arguments.Count > 0) {
 				WriteCommaSeparatedListInBrackets(arrayCreateExpression.Arguments);
 			}
+			int count = 0;
 			foreach (var specifier in arrayCreateExpression.AdditionalArraySpecifiers) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				specifier.AcceptVisitor(this);
 			}
 			arrayCreateExpression.Initializer.AcceptVisitor(this);
@@ -675,7 +705,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			OpenBrace(style);
 			bool isFirst = true;
 			AstNode last = null;
+			int count = 0;
 			foreach (AstNode node in elements) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (isFirst) {
 					isFirst = false;
 				} else {
@@ -1131,7 +1166,12 @@ namespace ICSharpCode.NRefactory.CSharp
 				NewLine();
 			}
 			bool first = true;
+			int count = 0;
 			foreach (var clause in queryExpression.Clauses) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (first) {
 					first = false;
 				} else {
@@ -1323,7 +1363,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			WriteTypeParameters(delegateDeclaration.TypeParameters);
 			Space(policy.SpaceBeforeDelegateDeclarationParentheses);
 			WriteCommaSeparatedListInParenthesis(delegateDeclaration.Parameters, policy.SpaceWithinMethodDeclarationParentheses);
+			int count = 0;
 			foreach (Constraint constraint in delegateDeclaration.Constraints) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				constraint.AcceptVisitor(this);
 			}
 			Semicolon();
@@ -1336,7 +1381,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			WriteKeyword(Roles.NamespaceKeyword);
 			namespaceDeclaration.NamespaceName.AcceptVisitor (this);
 			OpenBrace(policy.NamespaceBraceStyle);
+			int count = 0;
 			foreach (var member in namespaceDeclaration.Members) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				member.AcceptVisitor(this);
 				MaybeNewLinesAfterUsings(member);
 			}
@@ -1378,14 +1428,24 @@ namespace ICSharpCode.NRefactory.CSharp
 				Space();
 				WriteCommaSeparatedList(typeDeclaration.BaseTypes);
 			}
+			int count = 0;
 			foreach (Constraint constraint in typeDeclaration.Constraints) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				constraint.AcceptVisitor(this);
 			}
 			OpenBrace(braceStyle);
 			if (typeDeclaration.ClassType == ClassType.Enum) {
 				bool first = true;
 				AstNode last = null;
+				count = 0;
 				foreach (var member in typeDeclaration.Members) {
+					if (count-- <= 0) {
+						cancellationToken.ThrowIfCancellationRequested();
+						count = CANCEL_CHECK_LOOP_COUNT;
+					}
 					if (first) {
 						first = false;
 					} else {
@@ -1400,7 +1460,12 @@ namespace ICSharpCode.NRefactory.CSharp
 				NewLine();
 			} else {
 				bool first = true;
+				count = 0;
 				foreach (var member in typeDeclaration.Members) {
+					if (count-- <= 0) {
+						cancellationToken.ThrowIfCancellationRequested();
+						count = CANCEL_CHECK_LOOP_COUNT;
+					}
 					if (!first) {
 						for (int i = 0; i < policy.MinimumBlankLinesBetweenMembers; i++)
 							NewLine();
@@ -1486,7 +1551,12 @@ namespace ICSharpCode.NRefactory.CSharp
 				DebugHidden(blockStatement.HiddenStart);
 				DebugEnd(blockStatement, end);
 			}
+			int count = 0;
 			foreach (var node in blockStatement.Statements) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				node.AcceptVisitor(this);
 			}
 			EndNode(blockStatement);
@@ -1762,8 +1832,13 @@ namespace ICSharpCode.NRefactory.CSharp
 			if (!policy.IndentSwitchBody) {
 				writer.Unindent();
 			}
-			
+
+			int count = 0;
 			foreach (var section in switchStatement.SwitchSections) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				section.AcceptVisitor(this);
 			}
 			
@@ -1785,7 +1860,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		{
 			StartNode(switchSection);
 			bool first = true;
+			int count = 0;
 			foreach (var label in switchSection.CaseLabels) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (!first) {
 					NewLine();
 				}
@@ -1799,8 +1879,13 @@ namespace ICSharpCode.NRefactory.CSharp
 			
 			if (!isBlock)
 				NewLine();
-			
+
+			count = 0;
 			foreach (var statement in switchSection.Statements) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				statement.AcceptVisitor(this);
 			}
 			
@@ -1844,7 +1929,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			StartNode(tryCatchStatement);
 			WriteKeyword(TryCatchStatement.TryKeywordRole);
 			tryCatchStatement.TryBlock.AcceptVisitor(this);
+			int count = 0;
 			foreach (var catchClause in tryCatchStatement.CatchClauses) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				catchClause.AcceptVisitor(this);
 			}
 			if (!tryCatchStatement.FinallyBlock.IsNull) {
@@ -1989,7 +2079,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			// Writer doesn't write the comment before accessor if nothing has been printed yet.
 			// The following code works with our added comments.
 			if (accessor.Attributes.Count == 0 && !accessor.ModifierTokens.Any()) {
+				int count = 0;
 				foreach (var child in accessor.Children) {
+					if (count-- <= 0) {
+						cancellationToken.ThrowIfCancellationRequested();
+						count = CANCEL_CHECK_LOOP_COUNT;
+					}
 					var cmt = child as Comment;
 					if (cmt == null)
 						break;
@@ -2061,7 +2156,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			// Writer doesn't write the comment before destructorDeclaration if nothing has been printed yet.
 			// The following code works with our added comments.
 			if (destructorDeclaration.Attributes.Count == 0 && !destructorDeclaration.ModifierTokens.Any()) {
+				int count = 0;
 				foreach (var child in destructorDeclaration.Children) {
+					if (count-- <= 0) {
+						cancellationToken.ThrowIfCancellationRequested();
+						count = CANCEL_CHECK_LOOP_COUNT;
+					}
 					var cmt = child as Comment;
 					if (cmt == null)
 						break;
@@ -2124,7 +2224,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			WriteIdentifier(customEventDeclaration.NameToken);
 			OpenBrace(policy.EventBraceStyle);
 			// output add/remove in their original order
+			int count = 0;
 			foreach (AstNode node in customEventDeclaration.Children) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (node.Role == CustomEventDeclaration.AddAccessorRole || node.Role == CustomEventDeclaration.RemoveAccessorRole) {
 					node.AcceptVisitor(this);
 				}
@@ -2190,7 +2295,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			WriteCommaSeparatedListInBrackets(indexerDeclaration.Parameters, policy.SpaceWithinMethodDeclarationParentheses);
 			OpenBrace(policy.PropertyBraceStyle);
 			// output get/set in their original order
+			int count = 0;
 			foreach (AstNode node in indexerDeclaration.Children) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (node.Role == IndexerDeclaration.GetterRole || node.Role == IndexerDeclaration.SetterRole) {
 					node.AcceptVisitor(this);
 				}
@@ -2212,7 +2322,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			WriteTypeParameters(methodDeclaration.TypeParameters);
 			Space(policy.SpaceBeforeMethodDeclarationParentheses);
 			WriteCommaSeparatedListInParenthesis(methodDeclaration.Parameters, policy.SpaceWithinMethodDeclarationParentheses);
+			int count = 0;
 			foreach (Constraint constraint in methodDeclaration.Constraints) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				constraint.AcceptVisitor(this);
 			}
 			WriteMethodBody(methodDeclaration.Body);
@@ -2290,7 +2405,12 @@ namespace ICSharpCode.NRefactory.CSharp
 			WriteIdentifier(propertyDeclaration.NameToken);
 			OpenBrace(policy.PropertyBraceStyle);
 			// output get/set in their original order
+			int count = 0;
 			foreach (AstNode node in propertyDeclaration.Children) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				if (node.Role == IndexerDeclaration.GetterRole || node.Role == IndexerDeclaration.SetterRole) {
 					node.AcceptVisitor(this);
 				}
@@ -2331,7 +2451,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		public void VisitSyntaxTree(SyntaxTree syntaxTree)
 		{
 			// don't do node tracking as we visit all children directly
+			int count = 0;
 			foreach (AstNode node in syntaxTree.Children) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				node.AcceptVisitor(this);
 				MaybeNewLinesAfterUsings(node);
 			}
@@ -2370,10 +2495,20 @@ namespace ICSharpCode.NRefactory.CSharp
 			if (composedType.HasNullableSpecifier) {
 				WriteToken(ComposedType.NullableRole);
 			}
+			int count = 0;
 			for (int i = 0; i < composedType.PointerRank; i++) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				WriteToken(ComposedType.PointerRole);
 			}
+			count = 0;
 			foreach (var node in composedType.ArraySpecifiers) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				node.AcceptVisitor(this);
 			}
 			EndNode(composedType);
@@ -2383,7 +2518,12 @@ namespace ICSharpCode.NRefactory.CSharp
 		{
 			StartNode(arraySpecifier);
 			WriteToken(Roles.LBracket);
+			int count = 0;
 			foreach (var comma in arraySpecifier.GetChildrenByRole(Roles.Comma)) {
+				if (count-- <= 0) {
+					cancellationToken.ThrowIfCancellationRequested();
+					count = CANCEL_CHECK_LOOP_COUNT;
+				}
 				writer.WriteTokenOperator(Roles.Comma, ",");
 			}
 			WriteToken(Roles.RBracket);

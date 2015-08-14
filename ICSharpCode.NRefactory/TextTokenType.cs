@@ -307,6 +307,11 @@ namespace ICSharpCode.NRefactory {
 		/// </summary>
 		FileExtension,
 
+		/// <summary>
+		/// Error text
+		/// </summary>
+		Error,
+
 		// If you add a new one, also update ColorType
 
 		/// <summary>

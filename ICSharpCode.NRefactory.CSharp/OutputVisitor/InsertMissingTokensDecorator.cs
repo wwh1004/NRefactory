@@ -16,12 +16,11 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using dnSpy.NRefactory;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	class InsertMissingTokensDecorator : DecoratingTokenWriter
 	{
 		readonly Stack<List<AstNode>> nodes = new Stack<List<AstNode>>();

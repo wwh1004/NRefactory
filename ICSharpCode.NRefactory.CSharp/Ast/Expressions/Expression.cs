@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using dnSpy.NRefactory;
 
 namespace ICSharpCode.NRefactory.CSharp
 {

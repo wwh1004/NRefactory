@@ -17,11 +17,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Diagnostics;
 using System.IO;
+using dnSpy.NRefactory;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	public abstract class TokenWriter
 	{
 		public abstract void StartNode(AstNode node);

@@ -18,11 +18,10 @@
 
 using System;
 using System.Collections.Generic;
-using ICSharpCode.NRefactory.CSharp.Resolver;
+using dnSpy.NRefactory;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// A type reference in the C# AST.
 	/// </summary>

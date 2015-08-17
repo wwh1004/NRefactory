@@ -21,8 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using ICSharpCode.NRefactory.PatternMatching;
+using dnSpy.NRefactory;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	public class QueryExpressionExpansionResult {

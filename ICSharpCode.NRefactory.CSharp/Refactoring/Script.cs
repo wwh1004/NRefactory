@@ -23,20 +23,19 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using ICSharpCode.NRefactory.Editor;
-using ICSharpCode.NRefactory.TypeSystem;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
-using ICSharpCode.NRefactory.MonoCSharp;
+using System.Threading.Tasks;
+using dnSpy.NRefactory;
+using ICSharpCode.NRefactory.Editor;
+using ICSharpCode.NRefactory.TypeSystem;
 using ITypeDefinition = ICSharpCode.NRefactory.TypeSystem.ITypeDefinition;
 
-namespace ICSharpCode.NRefactory.CSharp.Refactoring
-{
+namespace ICSharpCode.NRefactory.CSharp.Refactoring {
 	/// <summary>
 	/// Class for creating change scripts.
 	/// 'Original document' = document without the change script applied.

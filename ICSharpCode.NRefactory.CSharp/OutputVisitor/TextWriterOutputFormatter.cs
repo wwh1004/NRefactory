@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using dnSpy.NRefactory;
 
 namespace ICSharpCode.NRefactory.CSharp
 {

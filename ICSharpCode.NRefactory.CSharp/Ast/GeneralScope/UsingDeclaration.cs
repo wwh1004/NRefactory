@@ -24,13 +24,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Linq;
-using System.Text;
 using System.Collections.Generic;
+using System.Text;
+using dnSpy.NRefactory;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// using Import;
 	/// </summary>

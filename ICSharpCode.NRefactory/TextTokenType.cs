@@ -20,7 +20,7 @@
 using System;
 using dnlib.DotNet;
 
-namespace ICSharpCode.NRefactory {
+namespace dnSpy.NRefactory {
 	public enum TextTokenType : byte {
 		/// <summary>
 		/// default text (in text editor)

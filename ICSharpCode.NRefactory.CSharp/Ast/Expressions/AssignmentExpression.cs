@@ -25,11 +25,11 @@
 // THE SOFTWARE.
 
 using System;
-using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using dnSpy.NRefactory;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// Left Operator= Right
 	/// </summary>

@@ -15,21 +15,18 @@
 // FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using dnSpy.NRefactory;
 using ICSharpCode.NRefactory.PatternMatching;
 using ICSharpCode.NRefactory.TypeSystem;
-using ICSharpCode.NRefactory.CSharp;
-using System.Threading;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// Outputs the AST.
 	/// </summary>

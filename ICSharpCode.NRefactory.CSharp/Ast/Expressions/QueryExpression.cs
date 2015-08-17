@@ -16,11 +16,10 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-namespace ICSharpCode.NRefactory.CSharp
-{
+using dnSpy.NRefactory;
+
+namespace ICSharpCode.NRefactory.CSharp {
 	public class QueryExpression : Expression
 	{
 		public static readonly Role<QueryClause> ClauseRole = new Role<QueryClause>("Clause");

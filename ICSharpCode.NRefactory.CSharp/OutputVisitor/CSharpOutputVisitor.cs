@@ -2201,6 +2201,23 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(eventDeclaration);
 			WriteAttributes(eventDeclaration.Attributes);
 			WriteModifiers(eventDeclaration.ModifierTokens);
+
+			// Writer doesn't write the comment before eventDeclaration if nothing has been printed yet.
+			// The following code works with our added comments.
+			if (eventDeclaration.Attributes.Count == 0 && !eventDeclaration.ModifierTokens.Any()) {
+				int count = 0;
+				foreach (var child in eventDeclaration.Children) {
+					if (count-- <= 0) {
+						cancellationToken.ThrowIfCancellationRequested();
+						count = CANCEL_CHECK_LOOP_COUNT;
+					}
+					var cmt = child as Comment;
+					if (cmt == null)
+						break;
+					cmt.AcceptVisitor(this);
+				}
+			}
+
 			WriteKeyword(EventDeclaration.EventKeywordRole);
 			eventDeclaration.ReturnType.AcceptVisitor(this);
 			Space();

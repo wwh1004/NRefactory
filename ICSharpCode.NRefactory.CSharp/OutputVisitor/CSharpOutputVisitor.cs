@@ -1755,6 +1755,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (!ifElseStatement.FalseStatement.IsNull) {
 				WriteKeyword(IfElseStatement.ElseKeywordRole);
 				if (ifElseStatement.FalseStatement is IfElseStatement) {
+					Space();
 					// don't put newline between 'else' and 'if'
 					ifElseStatement.FalseStatement.AcceptVisitor(this);
 				} else {
@@ -2069,9 +2070,6 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(accessor);
 			WriteAttributes(accessor.Attributes);
 			WriteModifiers(accessor.ModifierTokens);
-			bool isDefault = accessor.Body.IsNull;
-			if (isDefault)
-				DebugStart(accessor);
 
 			// Writer doesn't write the comment before accessor if nothing has been printed yet.
 			// The following code works with our added comments.
@@ -2089,6 +2087,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 				}
 			}
 
+			bool isDefault = accessor.Body.IsNull;
+			if (isDefault)
+				DebugStart(accessor);
 			if (accessor.Role == PropertyDeclaration.GetterRole) {
 				WriteKeywordIdentifier(PropertyDeclaration.GetKeywordRole);
 			} else if (accessor.Role == PropertyDeclaration.SetterRole) {

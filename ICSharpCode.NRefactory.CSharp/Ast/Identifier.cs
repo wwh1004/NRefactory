@@ -131,9 +131,9 @@ namespace ICSharpCode.NRefactory.CSharp
 
 		public static Identifier Create (string name, TextLocation location)
 		{
-			if (string.IsNullOrEmpty(name))
+			if (name == null)
 				return Identifier.Null;
-			if (name[0] == '@')
+			if (name.Length > 0 && name[0] == '@')
 				return new Identifier (name.Substring (1), new TextLocation (location.Line, location.Column + 1)) { IsVerbatim = true };
 			else
 				return new Identifier (name, location);
@@ -141,7 +141,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		public static Identifier Create (string name, TextLocation location, bool isVerbatim)
 		{
-			if (string.IsNullOrEmpty (name))
+			if (name == null)
 				return Identifier.Null;
 			
 			if (isVerbatim)

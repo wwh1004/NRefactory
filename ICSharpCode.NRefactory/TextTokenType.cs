@@ -312,6 +312,11 @@ namespace dnSpy.NRefactory {
 		/// </summary>
 		Error,
 
+		/// <summary>
+		/// ToString() eval text
+		/// </summary>
+		ToStringEval,
+
 		// If you add a new one, also update ColorType
 
 		/// <summary>

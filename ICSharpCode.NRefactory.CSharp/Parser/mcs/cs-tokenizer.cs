@@ -3212,7 +3212,9 @@ namespace ICSharpCode.NRefactory.MonoCSharp
 
 				value_builder[pos++] = (char) c;
 			}
+#pragma warning disable 0162 // Unreachable code detected
 			recordNewLine = true;
+#pragma warning restore 0162 // Unreachable code detected
 		}
 
 		private int consume_identifier (int s)

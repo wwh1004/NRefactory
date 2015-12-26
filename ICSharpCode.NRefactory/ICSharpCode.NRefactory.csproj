@@ -49,10 +49,12 @@
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
     <OutputPath>..\bin\Debug\</OutputPath>
+    <NoWarn>1591,1685</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>PdbOnly</DebugType>
     <OutputPath>..\bin\Release\</OutputPath>
+    <NoWarn>1591,1685</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'net_4_5_Debug' ">
     <Optimize>False</Optimize>
@@ -66,6 +68,7 @@
     <DebugSymbols>True</DebugSymbols>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\net_4_5_Debug\</OutputPath>
+    <NoWarn>1591,1685</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'net_4_5_Release' ">
     <Optimize>True</Optimize>
@@ -77,6 +80,7 @@
     <DebugType>none</DebugType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <OutputPath>..\bin\net_4_5_Release\</OutputPath>
+    <NoWarn>1591,1685</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -296,12 +300,7 @@
     <Compile Include="PatternMatching\AnyNodeOrNull.cs" />
     <Compile Include="Editor\ITextPasteHandler.cs" />
   </ItemGroup>
-   <ItemGroup>
-    <Folder Include="Completion\" />
-    <Folder Include="TypeSystem\" />
-    <Folder Include="Utils\CompositeFormatStringParser\" />
-    <Folder Include="Refactoring\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\dnlib\src\dnlib.csproj">
       <Project>{FDFC1237-143F-4919-8318-4926901F4639}</Project>

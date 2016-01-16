@@ -18,7 +18,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	class InsertMissingTokensDecorator : DecoratingTokenWriter
@@ -57,22 +57,22 @@ namespace ICSharpCode.NRefactory.CSharp {
 			base.EndNode(node);
 		}
 		
-		public override void WriteToken(Role role, string token, TextTokenType tokenType)
+		public override void WriteToken(Role role, string token, TextTokenKind tokenKind)
 		{
-			CSharpTokenNode t = new CSharpTokenNode(locationProvider.Location, (TokenRole)role);
+			CSharpTokenNode t = new CSharpTokenNode(locationProvider.Location.ToTextLocation(), (TokenRole)role);
 			t.Role = role;
 			EmptyStatement node = nodes.Peek().LastOrDefault() as EmptyStatement;
 			if (node == null)
 				currentList.Add(t);
 			else {
-				node.Location = locationProvider.Location;
+				node.Location = locationProvider.Location.ToTextLocation();
 			}
-			base.WriteToken(role, token, tokenType);
+			base.WriteToken(role, token, tokenKind);
 		}
 		
 		public override void WriteKeyword(Role role, string keyword)
 		{
-			TextLocation start = locationProvider.Location;
+			TextLocation start = locationProvider.Location.ToTextLocation();
 			CSharpTokenNode t = null;
 			if (role is TokenRole)
 				t = new CSharpTokenNode(start, (TokenRole)role);
@@ -91,31 +91,31 @@ namespace ICSharpCode.NRefactory.CSharp {
 			base.WriteKeyword(role, keyword);
 		}
 		
-		public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
+		public override void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
 		{
 			if (!identifier.IsNull)
-				identifier.SetStartLocation(locationProvider.Location);
+				identifier.SetStartLocation(locationProvider.Location.ToTextLocation());
 			currentList.Add(identifier);
-			base.WriteIdentifier(identifier, tokenType);
+			base.WriteIdentifier(identifier, tokenKind);
 		}
 		
-		public override void WritePrimitiveValue(object value, TextTokenType? tokenType = null, string literalValue = null)
+		public override void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null)
 		{
 			Expression node = nodes.Peek().LastOrDefault() as Expression;
 			if (node is PrimitiveExpression) {
-				((PrimitiveExpression)node).SetStartLocation(locationProvider.Location);
+				((PrimitiveExpression)node).SetStartLocation(locationProvider.Location.ToTextLocation());
 			}
 			if (node is NullReferenceExpression) {
-				((NullReferenceExpression)node).SetStartLocation(locationProvider.Location);
+				((NullReferenceExpression)node).SetStartLocation(locationProvider.Location.ToTextLocation());
 			}
-			base.WritePrimitiveValue(value, tokenType, literalValue);
+			base.WritePrimitiveValue(value, tokenKind, literalValue);
 		}
 		
 		public override void WritePrimitiveType(string type)
 		{
 			PrimitiveType node = nodes.Peek().LastOrDefault() as PrimitiveType;
 			if (node != null)
-				node.SetStartLocation(locationProvider.Location);
+				node.SetStartLocation(locationProvider.Location.ToTextLocation());
 			base.WritePrimitiveType(type);
 		}
 	}

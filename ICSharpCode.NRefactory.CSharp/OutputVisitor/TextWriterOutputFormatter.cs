@@ -21,7 +21,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp
 {
@@ -41,8 +41,8 @@ namespace ICSharpCode.NRefactory.CSharp
 			set { this.indentation = value; }
 		}
 		
-		public TextLocation Location {
-			get { return new TextLocation(line, column + (needsIndent ? indentation * IndentationString.Length : 0)); }
+		public TextPosition Location {
+			get { return new TextPosition(line, column + (needsIndent ? indentation * IndentationString.Length : 0)); }
 		}
 		
 		public string IndentationString { get; set; }
@@ -57,10 +57,10 @@ namespace ICSharpCode.NRefactory.CSharp
 			this.column = 1;
 		}
 		
-		public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
+		public override void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
 		{
 			WriteIndentation();
-			if (tokenType != TextTokenType.Keyword && (identifier.IsVerbatim || CSharpOutputVisitor.IsKeyword(identifier.Name, identifier))) {
+			if (tokenKind != TextTokenKind.Keyword && (identifier.IsVerbatim || CSharpOutputVisitor.IsKeyword(identifier.Name, identifier))) {
 				textWriter.Write('@');
 				column++;
 			}
@@ -77,7 +77,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			isAtStartOfLine = false;
 		}
 		
-		public override void WriteToken(Role role, string token, TextTokenType tokenType)
+		public override void WriteToken(Role role, string token, TextTokenKind tokenKind)
 		{
 			WriteIndentation();
 			column += token.Length;
@@ -207,37 +207,37 @@ namespace ICSharpCode.NRefactory.CSharp
 		{
 			TextWriter writer = new StringWriter();
 			TextWriterTokenWriter tokenWriter = new TextWriterTokenWriter(writer);
-			tokenWriter.WritePrimitiveValue(value, TextTokenHelper.GetTextTokenType(value));
+			tokenWriter.WritePrimitiveValue(value, TextTokenKindUtils.GetTextTokenType(value));
 			return writer.ToString();
 		}
 		
-		public override void WritePrimitiveValue(object value, TextTokenType? tokenType = null, string literalValue = null)
+		public override void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null)
 		{
-			WritePrimitiveValue(value, tokenType, literalValue, ref column, (a, b) => textWriter.Write(a), (a, b, c) => WriteToken(a, b, c));
+			WritePrimitiveValue(value, tokenKind, literalValue, ref column, (a, b) => textWriter.Write(a), (a, b, c) => WriteToken(a, b, c));
 		}
 		
-		public static void WritePrimitiveValue(object value, TextTokenType? tokenType, string literalValue, ref int column, Action<string, TextTokenType> writer, Action<Role, string, TextTokenType> writeToken)
+		public static void WritePrimitiveValue(object value, TextTokenKind? tokenKind, string literalValue, ref int column, Action<string, TextTokenKind> writer, Action<Role, string, TextTokenKind> writeToken)
 		{
 			if (literalValue != null) {
-				Debug.Assert(tokenType != null);
-				writer(literalValue, tokenType ?? TextTokenType.Text);
+				Debug.Assert(tokenKind != null);
+				writer(literalValue, tokenKind ?? TextTokenKind.Text);
 				column += literalValue.Length;
 				return;
 			}
 			
 			if (value == null) {
 				// usually NullReferenceExpression should be used for this, but we'll handle it anyways
-				writer("null", TextTokenType.Keyword);
+				writer("null", TextTokenKind.Keyword);
 				column += 4;
 				return;
 			}
 			
 			if (value is bool) {
 				if ((bool)value) {
-					writer("true", TextTokenType.Keyword);
+					writer("true", TextTokenKind.Keyword);
 					column += 4;
 				} else {
-					writer("false", TextTokenType.Keyword);
+					writer("false", TextTokenKind.Keyword);
 					column += 5;
 				}
 				return;
@@ -246,31 +246,31 @@ namespace ICSharpCode.NRefactory.CSharp
 			if (value is string) {
 				string tmp = "\"" + ConvertString(value.ToString()) + "\"";
 				column += tmp.Length;
-				writer(tmp, TextTokenType.String);
+				writer(tmp, TextTokenKind.String);
 			} else if (value is char) {
 				string tmp = "'" + ConvertCharLiteral((char)value) + "'";
 				column += tmp.Length;
-				writer(tmp, TextTokenType.Char);
+				writer(tmp, TextTokenKind.Char);
 			} else if (value is decimal) {
 				string str = ((decimal)value).ToString(NumberFormatInfo.InvariantInfo) + "m";
 				column += str.Length;
-				writer(str, TextTokenType.Number);
+				writer(str, TextTokenKind.Number);
 			} else if (value is float) {
 				float f = (float)value;
 				if (float.IsInfinity(f) || float.IsNaN(f)) {
 					// Strictly speaking, these aren't PrimitiveExpressions;
 					// but we still support writing these to make life easier for code generators.
-					writer("float", TextTokenType.Keyword);
+					writer("float", TextTokenKind.Keyword);
 					column += 5;
-					writeToken(Roles.Dot, ".", TextTokenType.Operator);
+					writeToken(Roles.Dot, ".", TextTokenKind.Operator);
 					if (float.IsPositiveInfinity(f)) {
-						writer("PositiveInfinity", TextTokenType.LiteralField);
+						writer("PositiveInfinity", TextTokenKind.LiteralField);
 						column += "PositiveInfinity".Length;
 					} else if (float.IsNegativeInfinity(f)) {
-						writer("NegativeInfinity", TextTokenType.LiteralField);
+						writer("NegativeInfinity", TextTokenKind.LiteralField);
 						column += "NegativeInfinity".Length;
 					} else {
-						writer("NaN", TextTokenType.LiteralField);
+						writer("NaN", TextTokenKind.LiteralField);
 						column += 3;
 					}
 					return;
@@ -283,23 +283,23 @@ namespace ICSharpCode.NRefactory.CSharp
 					number = "-" + number;
 				}
 				column += number.Length;
-				writer(number, TextTokenType.Number);
+				writer(number, TextTokenKind.Number);
 			} else if (value is double) {
 				double f = (double)value;
 				if (double.IsInfinity(f) || double.IsNaN(f)) {
 					// Strictly speaking, these aren't PrimitiveExpressions;
 					// but we still support writing these to make life easier for code generators.
-					writer("double", TextTokenType.Keyword);
+					writer("double", TextTokenKind.Keyword);
 					column += 6;
-					writeToken(Roles.Dot, ".", TextTokenType.Operator);
+					writeToken(Roles.Dot, ".", TextTokenKind.Operator);
 					if (double.IsPositiveInfinity(f)) {
-						writer("PositiveInfinity", TextTokenType.LiteralField);
+						writer("PositiveInfinity", TextTokenKind.LiteralField);
 						column += "PositiveInfinity".Length;
 					} else if (double.IsNegativeInfinity(f)) {
-						writer("NegativeInfinity", TextTokenType.LiteralField);
+						writer("NegativeInfinity", TextTokenKind.LiteralField);
 						column += "NegativeInfinity".Length;
 					} else {
-						writer("NaN", TextTokenType.LiteralField);
+						writer("NaN", TextTokenKind.LiteralField);
 						column += 3;
 					}
 					return;
@@ -315,7 +315,7 @@ namespace ICSharpCode.NRefactory.CSharp
 					number += ".0";
 				}
 				column += number.Length;
-				writer(number, TextTokenType.Number);
+				writer(number, TextTokenKind.Number);
 			} else if (value is IFormattable) {
 				StringBuilder b = new StringBuilder ();
 //				if (primitiveExpression.LiteralFormat == LiteralFormat.HexadecimalNumber) {
@@ -330,11 +330,11 @@ namespace ICSharpCode.NRefactory.CSharp
 				if (value is long || value is ulong) {
 					b.Append("L");
 				}
-				writer(b.ToString(), TextTokenType.Number);
+				writer(b.ToString(), TextTokenKind.Number);
 				column += b.Length;
 			} else {
 				var s = value.ToString();
-				writer(s, TextTokenHelper.GetTextTokenType(value));
+				writer(s, TextTokenKindUtils.GetTextTokenType(value));
 				column += s.Length;
 			}
 		}

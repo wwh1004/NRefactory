@@ -18,7 +18,7 @@
 
 using System;
 using System.IO;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 using ICSharpCode.NRefactory.CSharp.Refactoring;
 using ICSharpCode.NRefactory.TypeSystem;
 
@@ -113,7 +113,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			else if (symbol is IMember)
 				WriteMemberDeclarationName((IMember)symbol, writer, formattingPolicy);
 			else
-				writer.WriteIdentifier(Identifier.Create(symbol.Name), TextTokenType.Text);
+				writer.WriteIdentifier(Identifier.Create(symbol.Name), TextTokenKind.Text);
 			
 			if ((ConversionFlags & ConversionFlags.ShowParameterList) == ConversionFlags.ShowParameterList && HasParameters(symbol)) {
 				writer.WriteTokenOperator(symbol.SymbolKind == SymbolKind.Indexer ? Roles.LBracket : Roles.LPar, symbol.SymbolKind == SymbolKind.Indexer ? "[" : "(");
@@ -193,7 +193,7 @@ namespace ICSharpCode.NRefactory.CSharp
 					writer.WriteTokenOperator(Roles.Dot, ".");
 				}
 			}
-			writer.WriteIdentifier(node.NameToken, TextTokenType.Text);
+			writer.WriteIdentifier(node.NameToken, TextTokenKind.Text);
 			if ((ConversionFlags & ConversionFlags.ShowTypeParameterList) == ConversionFlags.ShowTypeParameterList) {
 				var outputVisitor = new CSharpOutputVisitor(writer, formattingPolicy);
 				outputVisitor.WriteTypeParameters(node.GetChildrenByRole(Roles.TypeParameter));
@@ -240,14 +240,14 @@ namespace ICSharpCode.NRefactory.CSharp
 							writer.Space();
 							var operatorType = OperatorDeclaration.GetOperatorType(member.Name);
 							if (operatorType.HasValue)
-								writer.WriteToken(OperatorDeclaration.GetRole(operatorType.Value), OperatorDeclaration.GetToken(operatorType.Value), TextTokenType.Text);
+								writer.WriteToken(OperatorDeclaration.GetRole(operatorType.Value), OperatorDeclaration.GetToken(operatorType.Value), TextTokenKind.Text);
 							else
-								writer.WriteIdentifier(node.NameToken, TextTokenType.Text);
+								writer.WriteIdentifier(node.NameToken, TextTokenKind.Text);
 							break;
 					}
 					break;
 				default:
-					writer.WriteIdentifier(Identifier.Create(member.Name), TextTokenType.Text);
+					writer.WriteIdentifier(Identifier.Create(member.Name), TextTokenKind.Text);
 					break;
 			}
 			if ((ConversionFlags & ConversionFlags.ShowTypeParameterList) == ConversionFlags.ShowTypeParameterList && member.SymbolKind == SymbolKind.Method) {
@@ -268,7 +268,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		void WriteQualifiedName(string name, TokenWriter writer, CSharpFormattingOptions formattingPolicy)
 		{
-			var node = AstType.Create(name, TextTokenType.Text);
+			var node = AstType.Create(name, TextTokenKind.Text);
 			var outputVisitor = new CSharpOutputVisitor(writer, formattingPolicy);
 			node.AcceptVisitor(outputVisitor);
 		}

@@ -22,7 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 using ICSharpCode.NRefactory.PatternMatching;
 using ICSharpCode.NRefactory.TypeSystem;
 
@@ -84,7 +84,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		#region debug statements
 		int preventDebugStart = 0;
-		void DebugStart(AstNode node, TextLocation? start = null)
+		void DebugStart(AstNode node, TextPosition? start = null)
 		{
 			if (++preventDebugStart == 1)
 				writer.DebugStart(node, start);
@@ -115,7 +115,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			DebugEnd(node, null, addSelf);
 		}
 
-		void DebugEnd(AstNode node, TextLocation? end, bool addSelf = true)
+		void DebugEnd(AstNode node, TextPosition? end, bool addSelf = true)
 		{
 			if (addSelf)
 				writer.DebugExpression(node);
@@ -268,7 +268,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (node != null)
 				DebugStart(node);
 			if (isId)
-				writer.WriteIdentifier(Identifier.Create(token), TextTokenType.Keyword);
+				writer.WriteIdentifier(Identifier.Create(token), TextTokenKind.Keyword);
 			else
 				writer.WriteKeyword(tokenRole, token);
 			isAtStartOfLine = false;
@@ -276,18 +276,18 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		protected virtual void WriteIdentifier(Identifier identifier)
 		{
-			WriteIdentifier(identifier, identifier.AnnotationVT<TextTokenType>() ?? TextTokenType.Text);
+			WriteIdentifier(identifier, identifier.AnnotationVT<TextTokenKind>() ?? TextTokenKind.Text);
 		}
 
-		void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
+		void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
 		{
-			writer.WriteIdentifier(identifier, tokenType);
+			writer.WriteIdentifier(identifier, tokenKind);
 			isAtStartOfLine = false;
 		}
 		
-		protected virtual void WriteIdentifier(string identifier, TextTokenType tokenType)
+		protected virtual void WriteIdentifier(string identifier, TextTokenKind tokenKind)
 		{
-			AstType.Create(identifier, tokenType).AcceptVisitor(this);
+			AstType.Create(identifier, tokenKind).AcceptVisitor(this);
 			isAtStartOfLine = false;
 		}
 		
@@ -348,17 +348,17 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		protected virtual void OpenBrace(BraceStyle style)
 		{
-			TextLocation? start, end;
+			TextPosition? start, end;
 			OpenBrace(style, out start, out end);
 		}
 
 		void CloseBrace(BraceStyle style)
 		{
-			TextLocation? start, end;
+			TextPosition? start, end;
 			CloseBrace(style, out start, out end);
 		}
 		
-		void OpenBrace(BraceStyle style, out TextLocation? start, out TextLocation? end)
+		void OpenBrace(BraceStyle style, out TextPosition? start, out TextPosition? end)
 		{
 			switch (style) {
 				case BraceStyle.DoNotChange:
@@ -367,26 +367,26 @@ namespace ICSharpCode.NRefactory.CSharp {
 					if (!isAtStartOfLine)
 						writer.Space();
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.LBrace, "{", TextTokenType.Brace);
+					writer.WriteToken(Roles.LBrace, "{", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					break;
 				case BraceStyle.EndOfLineWithoutSpace:
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.LBrace, "{", TextTokenType.Brace);
+					writer.WriteToken(Roles.LBrace, "{", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					break;
 				case BraceStyle.NextLine:
 					if (!isAtStartOfLine)
 						NewLine();
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.LBrace, "{", TextTokenType.Brace);
+					writer.WriteToken(Roles.LBrace, "{", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					break;
 				case BraceStyle.NextLineShifted:
 					NewLine();
 					writer.Indent();
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.LBrace, "{", TextTokenType.Brace);
+					writer.WriteToken(Roles.LBrace, "{", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					NewLine();
 					return;
@@ -394,7 +394,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					NewLine();
 					writer.Indent();
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.LBrace, "{", TextTokenType.Brace);
+					writer.WriteToken(Roles.LBrace, "{", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					break;
 				default:
@@ -404,7 +404,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			NewLine();
 		}
 		
-		protected virtual void CloseBrace(BraceStyle style, out TextLocation? start, out TextLocation? end)
+		protected virtual void CloseBrace(BraceStyle style, out TextPosition? start, out TextPosition? end)
 		{
 			switch (style) {
 				case BraceStyle.DoNotChange:
@@ -413,14 +413,14 @@ namespace ICSharpCode.NRefactory.CSharp {
 				case BraceStyle.NextLine:
 					writer.Unindent();
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.RBrace, "}", TextTokenType.Brace);
+					writer.WriteToken(Roles.RBrace, "}", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					isAtStartOfLine = false;
 					break;
 				case BraceStyle.BannerStyle:
 				case BraceStyle.NextLineShifted:
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.RBrace, "}", TextTokenType.Brace);
+					writer.WriteToken(Roles.RBrace, "}", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					isAtStartOfLine = false;
 					writer.Unindent();
@@ -428,7 +428,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				case BraceStyle.NextLineShifted2:
 					writer.Unindent();
 					start = writer.GetLocation();
-					writer.WriteToken(Roles.RBrace, "}", TextTokenType.Brace);
+					writer.WriteToken(Roles.RBrace, "}", TextTokenKind.Brace);
 					end = writer.GetLocation();
 					isAtStartOfLine = false;
 					writer.Unindent();
@@ -532,7 +532,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				} else {
 					writer.WriteTokenOperator(Roles.Dot, ".");
 				}
-				writer.WriteIdentifier(ident, TextTokenHelper.GetTextTokenType(ident.Annotation<object>()));
+				writer.WriteIdentifier(ident, TextTokenKindUtils.GetTextTokenType(ident.Annotation<object>()));
 			}
 		}
 		
@@ -895,7 +895,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			DebugExpression(identifierExpression);
 			StartNode(identifierExpression);
-			WriteIdentifier(identifierExpression.IdentifierToken, TextTokenHelper.GetTextTokenType(identifierExpression.IdentifierToken.Annotation<object>()));
+			WriteIdentifier(identifierExpression.IdentifierToken, TextTokenKindUtils.GetTextTokenType(identifierExpression.IdentifierToken.Annotation<object>()));
 			WriteTypeArguments(identifierExpression.TypeArguments);
 			EndNode(identifierExpression);
 		}
@@ -966,7 +966,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(memberReferenceExpression);
 			memberReferenceExpression.Target.AcceptVisitor(this);
 			WriteToken(Roles.Dot);
-			WriteIdentifier(memberReferenceExpression.MemberNameToken, TextTokenHelper.GetTextTokenType(memberReferenceExpression.MemberNameToken.Annotation<object>() ?? memberReferenceExpression.Annotation<object>()));
+			WriteIdentifier(memberReferenceExpression.MemberNameToken, TextTokenKindUtils.GetTextTokenType(memberReferenceExpression.MemberNameToken.Annotation<object>() ?? memberReferenceExpression.Annotation<object>()));
 			WriteTypeArguments(memberReferenceExpression.TypeArguments);
 			EndNode(memberReferenceExpression);
 		}
@@ -1048,7 +1048,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(pointerReferenceExpression);
 			pointerReferenceExpression.Target.AcceptVisitor(this);
 			WriteToken(PointerReferenceExpression.ArrowRole);
-			WriteIdentifier(pointerReferenceExpression.MemberNameToken, TextTokenHelper.GetTextTokenType(pointerReferenceExpression.MemberNameToken.Annotation<object>()));
+			WriteIdentifier(pointerReferenceExpression.MemberNameToken, TextTokenKindUtils.GetTextTokenType(pointerReferenceExpression.MemberNameToken.Annotation<object>()));
 			WriteTypeArguments(pointerReferenceExpression.TypeArguments);
 			EndNode(pointerReferenceExpression);
 		}
@@ -1058,7 +1058,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			DebugExpression(primitiveExpression);
 			StartNode(primitiveExpression);
-			writer.WritePrimitiveValue(primitiveExpression.Value, TextTokenType.Text, primitiveExpression.UnsafeLiteralValue);
+			writer.WritePrimitiveValue(primitiveExpression.Value, TextTokenKind.Text, primitiveExpression.UnsafeLiteralValue);
 			EndNode(primitiveExpression);
 		}
 		#endregion
@@ -1242,7 +1242,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteKeyword(QueryJoinClause.JoinKeywordRole);
 			queryJoinClause.Type.AcceptVisitor(this);
 			Space();
-			WriteIdentifier(queryJoinClause.JoinIdentifierToken, TextTokenHelper.GetTextTokenType(queryJoinClause.JoinIdentifierToken.Annotation<object>()));
+			WriteIdentifier(queryJoinClause.JoinIdentifierToken, TextTokenKindUtils.GetTextTokenType(queryJoinClause.JoinIdentifierToken.Annotation<object>()));
 			Space();
 			WriteKeyword(QueryJoinClause.InKeywordRole);
 			Space();
@@ -1258,7 +1258,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (queryJoinClause.IsGroupJoin) {
 				Space();
 				WriteKeyword(QueryJoinClause.IntoKeywordRole);
-				WriteIdentifier(queryJoinClause.IntoIdentifierToken, TextTokenHelper.GetTextTokenType(queryJoinClause.IntoIdentifierToken.Annotation<object>()));
+				WriteIdentifier(queryJoinClause.IntoIdentifierToken, TextTokenKindUtils.GetTextTokenType(queryJoinClause.IntoIdentifierToken.Annotation<object>()));
 			}
 			EndNode(queryJoinClause);
 		}
@@ -1481,7 +1481,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(usingAliasDeclaration);
 			WriteKeyword(UsingAliasDeclaration.UsingKeywordRole);
-			WriteIdentifier(usingAliasDeclaration.GetChildByRole(UsingAliasDeclaration.AliasRole), TextTokenType.Text);
+			WriteIdentifier(usingAliasDeclaration.GetChildByRole(UsingAliasDeclaration.AliasRole), TextTokenKind.Text);
 			Space(policy.SpaceAroundEqualityOperator);
 			WriteToken(Roles.Assign);
 			Space(policy.SpaceAroundEqualityOperator);
@@ -1541,7 +1541,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			} else {
 				style = policy.StatementBraceStyle;
 			}
-			TextLocation? start, end;
+			TextPosition? start, end;
 			OpenBrace(style, out start, out end);
 			if (blockStatement.HiddenStart != null) {
 				DebugStart(blockStatement, start);
@@ -1735,7 +1735,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(gotoStatement);
 			DebugStart(gotoStatement);
 			WriteKeyword(GotoStatement.GotoKeywordRole);
-			WriteIdentifier(gotoStatement.GetChildByRole(Roles.Identifier), TextTokenType.Label);
+			WriteIdentifier(gotoStatement.GetChildByRole(Roles.Identifier), TextTokenKind.Label);
 			SemicolonDebugEnd(gotoStatement);
 			EndNode(gotoStatement);
 		}
@@ -1769,7 +1769,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			DebugExpression(labelStatement);
 			StartNode(labelStatement);
-			WriteIdentifier(labelStatement.GetChildByRole(Roles.Identifier), TextTokenType.Label);
+			WriteIdentifier(labelStatement.GetChildByRole(Roles.Identifier), TextTokenKind.Label);
 			WriteToken(Roles.Colon);
 			bool foundLabelledStatement = false;
 			for (AstNode tmp = labelStatement.NextSibling; tmp != null; tmp = tmp.NextSibling) {
@@ -1843,7 +1843,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (!policy.IndentSwitchBody) {
 				writer.Indent();
 			}
-			TextLocation? start, end;
+			TextPosition? start, end;
 			CloseBrace(policy.StatementBraceStyle, out start, out end);
 			if (switchStatement.HiddenEnd != null) {
 				DebugStart(switchStatement, start);
@@ -2113,7 +2113,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteModifiers(constructorDeclaration.ModifierTokens);
 			TypeDeclaration type = constructorDeclaration.Parent as TypeDeclaration;
 			var method = constructorDeclaration.Annotation<dnlib.DotNet.MethodDef>();
-			var textToken = method == null ? TextTokenType.Type : TextTokenHelper.GetTextTokenType(method.DeclaringType);
+			var textToken = method == null ? TextTokenKind.Type : TextTokenKindUtils.GetTextTokenType(method.DeclaringType);
 			if (type != null && type.Name != constructorDeclaration.Name)
 				WriteIdentifier((Identifier)type.NameToken.Clone(), textToken);
 			else
@@ -2170,7 +2170,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteToken(DestructorDeclaration.TildeRole);
 			TypeDeclaration type = destructorDeclaration.Parent as TypeDeclaration;
 			var method = destructorDeclaration.Annotation<dnlib.DotNet.MethodDef>();
-			var textToken = method == null ? TextTokenType.Type : TextTokenHelper.GetTextTokenType(method.DeclaringType);
+			var textToken = method == null ? TextTokenKind.Type : TextTokenKindUtils.GetTextTokenType(method.DeclaringType);
 			if (type != null && type.Name != destructorDeclaration.Name)
 				WriteIdentifier((Identifier)type.NameToken.Clone(), textToken);
 			else
@@ -2484,7 +2484,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				// It's the empty string. Don't call WriteIdentifier() since it will write "<<EMPTY_NAME>>"
 			}
 			else
-				WriteIdentifier(simpleType.IdentifierToken, TextTokenHelper.GetTextTokenType(simpleType.IdentifierToken.Annotation<object>() ?? simpleType.Annotation<object>()));
+				WriteIdentifier(simpleType.IdentifierToken, TextTokenKindUtils.GetTextTokenType(simpleType.IdentifierToken.Annotation<object>() ?? simpleType.Annotation<object>()));
 			WriteTypeArguments(simpleType.TypeArguments);
 			EndNode(simpleType);
 		}
@@ -2498,7 +2498,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			} else {
 				WriteToken(Roles.Dot);
 			}
-			WriteIdentifier(memberType.MemberNameToken, TextTokenHelper.GetTextTokenType(memberType.MemberNameToken.Annotation<object>() ?? memberType.Annotation<object>()));
+			WriteIdentifier(memberType.MemberNameToken, TextTokenKindUtils.GetTextTokenType(memberType.MemberNameToken.Annotation<object>() ?? memberType.Annotation<object>()));
 			WriteTypeArguments(memberType.TypeArguments);
 			EndNode(memberType);
 		}
@@ -2633,7 +2633,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			// Do not call StartNode and EndNode for Identifier, because they are handled by the ITokenWriter.
 			// ITokenWriter assumes that each node processed between a
 			// StartNode(parentNode)-EndNode(parentNode)-pair is a child of parentNode.
-			WriteIdentifier(identifier, TextTokenHelper.GetTextTokenType(identifier.Annotation<object>()));
+			WriteIdentifier(identifier, TextTokenKindUtils.GetTextTokenType(identifier.Annotation<object>()));
 		}
 
 		void IAstVisitor.VisitNullNode(AstNode nullNode)
@@ -2658,7 +2658,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		void VisitAnyNode(AnyNode anyNode)
 		{
 			if (!string.IsNullOrEmpty(anyNode.GroupName)) {
-				WriteIdentifier(anyNode.GroupName, TextTokenType.Text);
+				WriteIdentifier(anyNode.GroupName, TextTokenKind.Text);
 				WriteToken(Roles.Colon);
 			}
 		}
@@ -2667,7 +2667,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			WriteKeyword("backreference");
 			LPar();
-			WriteIdentifier(backreference.ReferencedGroupName, TextTokenType.Text);
+			WriteIdentifier(backreference.ReferencedGroupName, TextTokenKind.Text);
 			RPar();
 		}
 		
@@ -2675,7 +2675,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			WriteKeyword("identifierBackreference");
 			LPar();
-			WriteIdentifier(identifierExpressionBackreference.ReferencedGroupName, TextTokenType.Text);
+			WriteIdentifier(identifierExpressionBackreference.ReferencedGroupName, TextTokenKind.Text);
 			RPar();
 		}
 		
@@ -2700,7 +2700,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		void VisitNamedNode(NamedNode namedNode)
 		{
 			if (!string.IsNullOrEmpty(namedNode.GroupName)) {
-				WriteIdentifier(namedNode.GroupName, TextTokenType.Text);
+				WriteIdentifier(namedNode.GroupName, TextTokenKind.Text);
 				WriteToken(Roles.Colon);
 			}
 			VisitNodeInPattern(namedNode.ChildNode);
@@ -2711,9 +2711,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteKeyword("repeat");
 			LPar();
 			if (repeat.MinCount != 0 || repeat.MaxCount != int.MaxValue) {
-				WriteIdentifier(repeat.MinCount.ToString(), TextTokenType.Number);
+				WriteIdentifier(repeat.MinCount.ToString(), TextTokenKind.Number);
 				WriteToken(Roles.Comma);
-				WriteIdentifier(repeat.MaxCount.ToString(), TextTokenType.Number);
+				WriteIdentifier(repeat.MaxCount.ToString(), TextTokenKind.Number);
 				WriteToken(Roles.Comma);
 			}
 			VisitNodeInPattern(repeat.ChildNode);
@@ -2785,7 +2785,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					}
 					break;
 				default:
-					WriteIdentifier(documentationReference.GetChildByRole(Roles.Identifier), TextTokenType.Text);
+					WriteIdentifier(documentationReference.GetChildByRole(Roles.Identifier), TextTokenKind.Text);
 					break;
 			}
 			WriteTypeArguments(documentationReference.TypeArguments);

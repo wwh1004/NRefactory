@@ -18,7 +18,7 @@
 
 using System;
 using System.IO;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	public abstract class TokenWriter
@@ -29,7 +29,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		/// <summary>
 		/// Writes an identifier.
 		/// </summary>
-		public abstract void WriteIdentifier(Identifier identifier, TextTokenType tokenType);
+		public abstract void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind);
 		
 		/// <summary>
 		/// Writes a keyword to the output.
@@ -39,12 +39,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 		/// <summary>
 		/// Writes a token to the output.
 		/// </summary>
-		public abstract void WriteToken(Role role, string token, TextTokenType tokenType);
+		public abstract void WriteToken(Role role, string token, TextTokenKind tokenKind);
 		
 		/// <summary>
 		/// Writes a primitive/literal value
 		/// </summary>
-		public abstract void WritePrimitiveValue(object value, TextTokenType? tokenType = null, string literalValue = null);
+		public abstract void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null);
 		
 		public abstract void WritePrimitiveType(string type);
 		
@@ -74,7 +74,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			return new InsertSpecialsDecorator(new InsertRequiredSpacesDecorator(new InsertMissingTokensDecorator(writer, (ILocatable)writer)));
 		}
 
-		public virtual void DebugStart(AstNode node, TextLocation? start)
+		public virtual void DebugStart(AstNode node, TextPosition? start)
 		{
 		}
 
@@ -86,36 +86,36 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 		}
 
-		public virtual void DebugEnd(AstNode node, TextLocation? end)
+		public virtual void DebugEnd(AstNode node, TextPosition? end)
 		{
 		}
 
 		// Don't use Location prop since it's used by ILocatable. We want that whoever can provide
 		// this value can do it so we can't check the writer to see if it implements ILocatable
-		public virtual TextLocation? GetLocation()
+		public virtual TextPosition? GetLocation()
 		{
 			return null;
 		}
 
 		public void WriteTokenOperator(Role tokenRole, string token)
 		{
-			WriteToken(tokenRole, token, TextTokenType.Operator);
+			WriteToken(tokenRole, token, TextTokenKind.Operator);
 		}
 
 		public void WriteTokenBrace(Role tokenRole, string token)
 		{
-			WriteToken(tokenRole, token, TextTokenType.Brace);
+			WriteToken(tokenRole, token, TextTokenKind.Brace);
 		}
 
 		public void WriteTokenNumber(Role tokenRole, string token)
 		{
-			WriteToken(tokenRole, token, TextTokenType.Number);
+			WriteToken(tokenRole, token, TextTokenKind.Number);
 		}
 	}
 	
 	public interface ILocatable
 	{
-		TextLocation Location { get; }
+		TextPosition Location { get; }
 	}
 	
 	public abstract class DecoratingTokenWriter : TokenWriter
@@ -139,9 +139,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.EndNode(node);
 		}
 		
-		public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
+		public override void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
 		{
-			decoratedWriter.WriteIdentifier(identifier, tokenType);
+			decoratedWriter.WriteIdentifier(identifier, tokenKind);
 		}
 		
 		public override void WriteKeyword(Role role, string keyword)
@@ -149,14 +149,14 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.WriteKeyword(role, keyword);
 		}
 		
-		public override void WriteToken(Role role, string token, TextTokenType tokenType)
+		public override void WriteToken(Role role, string token, TextTokenKind tokenKind)
 		{
-			decoratedWriter.WriteToken(role, token, tokenType);
+			decoratedWriter.WriteToken(role, token, tokenKind);
 		}
 		
-		public override void WritePrimitiveValue(object value, TextTokenType? tokenType = null, string literalValue = null)
+		public override void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null)
 		{
-			decoratedWriter.WritePrimitiveValue(value, tokenType, literalValue);
+			decoratedWriter.WritePrimitiveValue(value, tokenKind, literalValue);
 		}
 		
 		public override void WritePrimitiveType(string type)
@@ -194,7 +194,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.WritePreProcessorDirective(type, argument);
 		}
 
-		public override void DebugStart(AstNode node, TextLocation? start)
+		public override void DebugStart(AstNode node, TextPosition? start)
 		{
 			decoratedWriter.DebugStart(node, start);
 		}
@@ -209,12 +209,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.DebugExpression(node);
 		}
 
-		public override void DebugEnd(AstNode node, TextLocation? end)
+		public override void DebugEnd(AstNode node, TextPosition? end)
 		{
 			decoratedWriter.DebugEnd(node, end);
 		}
 
-		public override TextLocation? GetLocation()
+		public override TextPosition? GetLocation()
 		{
 			return decoratedWriter.GetLocation();
 		}

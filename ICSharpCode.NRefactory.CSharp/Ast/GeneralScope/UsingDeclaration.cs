@@ -26,7 +26,7 @@
 
 using System.Collections.Generic;
 using System.Text;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
@@ -88,7 +88,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		public UsingDeclaration (string nameSpace)
 		{
-			AddChild (AstType.Create (nameSpace, TextTokenType.NamespacePart), ImportRole);
+			AddChild (AstType.Create (nameSpace, TextTokenKind.NamespacePart), ImportRole);
 		}
 		
 		public UsingDeclaration (AstType import)

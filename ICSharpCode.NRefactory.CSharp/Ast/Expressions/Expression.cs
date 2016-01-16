@@ -18,7 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp
 {
@@ -195,7 +195,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			MemberReferenceExpression mre = new MemberReferenceExpression();
 			mre.Target = this;
 			mre.MemberName = methodName;
-			mre.MemberNameToken.AddAnnotation(annotation ?? TextTokenType.InstanceMethod);
+			mre.MemberNameToken.AddAnnotation(annotation ?? TextTokenKind.InstanceMethod);
 			mre.TypeArguments.AddRange(typeArguments);
 			ie.Target = mre;
 			ie.Arguments.AddRange(arguments);

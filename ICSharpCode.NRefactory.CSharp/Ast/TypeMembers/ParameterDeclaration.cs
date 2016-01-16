@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	public enum ParameterModifier {
@@ -126,7 +126,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			Type = type;
 			NameToken = Identifier.Create(name);
-			NameToken.AddAnnotation(TextTokenType.Parameter);
+			NameToken.AddAnnotation(TextTokenKind.Parameter);
 			ParameterModifier = modifier;
 		}
 

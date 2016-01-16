@@ -144,7 +144,6 @@
     <Compile Include="Semantics\TypeResolveResult.cs" />
     <Compile Include="Semantics\UnknownMemberResolveResult.cs" />
     <Compile Include="TextLocation.cs" />
-    <Compile Include="TextTokenType.cs" />
     <Compile Include="TypeSystem\Accessibility.cs" />
     <Compile Include="TypeSystem\AnonymousType.cs" />
     <Compile Include="TypeSystem\ArrayType.cs" />
@@ -305,6 +304,10 @@
     <ProjectReference Include="..\..\dnlib\src\dnlib.csproj">
       <Project>{FDFC1237-143F-4919-8318-4926901F4639}</Project>
       <Name>dnlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\dnSpy.Decompiler.Shared\dnSpy.Decompiler.Shared.csproj">
+      <Project>{a027546a-cf4b-47f9-bc53-ee1ad424ee41}</Project>
+      <Name>dnSpy.Decompiler.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -30,7 +30,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 using ICSharpCode.NRefactory.Editor;
 using ICSharpCode.NRefactory.TypeSystem;
 using ITypeDefinition = ICSharpCode.NRefactory.TypeSystem.ITypeDefinition;
@@ -496,12 +496,12 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring {
 				this.stringWriter = stringWriter;
 			}
 			
-			public override void WriteIdentifier(Identifier identifier, TextTokenType tokenType)
+			public override void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
 			{
 				int startOffset = stringWriter.GetStringBuilder ().Length;
 				int endOffset = startOffset + (identifier.Name ?? "").Length + (identifier.IsVerbatim ? 1 : 0);
 				NewSegments.Add(new KeyValuePair<AstNode, Segment>(identifier, new Segment(startOffset, endOffset - startOffset)));
-				base.WriteIdentifier (identifier, tokenType);
+				base.WriteIdentifier (identifier, tokenKind);
 			}
 			
 			public override void StartNode (AstNode node)

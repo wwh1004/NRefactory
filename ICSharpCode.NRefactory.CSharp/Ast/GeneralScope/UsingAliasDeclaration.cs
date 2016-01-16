@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp
 {
@@ -81,7 +81,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		{
 			AddChild (Identifier.Create (alias), AliasRole);
 			var st = new SimpleType (nameSpace);
-			st.AddAnnotation (TextTokenType.NamespacePart);
+			st.AddAnnotation (TextTokenKind.NamespacePart);
 			AddChild (st, ImportRole);
 		}
 		

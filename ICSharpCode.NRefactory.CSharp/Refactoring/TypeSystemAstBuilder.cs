@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.CSharp.TypeSystem;
 using ICSharpCode.NRefactory.Semantics;
@@ -509,7 +509,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 				if (c < TypeCode.Char || c > TypeCode.Double)
 					continue;
 				if (field.IsConst && object.Equals(CSharpPrimitiveCast.Cast(TypeCode.Int64, field.ConstantValue, false), val))
-					return ConvertType(type).Member(field.Name, TextTokenType.LiteralField);
+					return ConvertType(type).Member(field.Name, TextTokenKind.LiteralField);
 			}
 			if (IsFlagsEnum(enumDefinition)) {
 				long enumValue = val;
@@ -540,7 +540,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 						continue;	// skip None enum value
 
 					if ((fieldValue & enumValue) == fieldValue) {
-						var fieldExpression = ConvertType(type).Member(field.Name, TextTokenType.LiteralField);
+						var fieldExpression = ConvertType(type).Member(field.Name, TextTokenKind.LiteralField);
 						if (expr == null)
 							expr = fieldExpression;
 						else
@@ -549,7 +549,7 @@ namespace ICSharpCode.NRefactory.CSharp.Refactoring
 						enumValue &= ~fieldValue;
 					}
 					if ((fieldValue & negatedEnumValue) == fieldValue) {
-						var fieldExpression = ConvertType(type).Member(field.Name, TextTokenType.LiteralField);
+						var fieldExpression = ConvertType(type).Member(field.Name, TextTokenKind.LiteralField);
 						if (negatedExpr == null)
 							negatedExpr = fieldExpression;
 						else

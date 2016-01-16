@@ -26,7 +26,7 @@
 
 using System;
 using System.Collections.Generic;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
@@ -58,17 +58,17 @@ namespace ICSharpCode.NRefactory.CSharp {
 			}
 			set {
 				var arr = value.Split('.');
-				NamespaceName = ConstructType(arr, arr.Length - 1, TextTokenType.NamespacePart);
+				NamespaceName = ConstructType(arr, arr.Length - 1, TextTokenKind.NamespacePart);
 			}
 		}
 
-		static AstType ConstructType(string[] arr, int i, TextTokenType tokenType)
+		static AstType ConstructType(string[] arr, int i, TextTokenKind tokenKind)
 		{
 			if (i < 0 || i >= arr.Length)
 				throw new ArgumentOutOfRangeException("i");
 			if (i == 0)
-				return new SimpleType(arr[i]).WithAnnotation(tokenType);
-			return new MemberType(ConstructType(arr, i - 1, TextTokenType.NamespacePart), arr[i]).WithAnnotation(tokenType);
+				return new SimpleType(arr[i]).WithAnnotation(tokenKind);
+			return new MemberType(ConstructType(arr, i - 1, TextTokenKind.NamespacePart), arr[i]).WithAnnotation(tokenKind);
 		}
 
 		/// <summary>

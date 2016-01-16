@@ -18,7 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-using dnSpy.NRefactory;
+using dnSpy.Decompiler.Shared;
 using ICSharpCode.NRefactory.TypeSystem;
 
 namespace ICSharpCode.NRefactory.CSharp {
@@ -274,12 +274,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 		/// Does not support generics, arrays, etc. - just simple dotted names,
 		/// e.g. namespace names.
 		/// </summary>
-		public static AstType Create(string dottedName, TextTokenType tokenType)
+		public static AstType Create(string dottedName, TextTokenKind tokenKind)
 		{
 			string[] parts = dottedName.Split('.');
-			AstType type = new SimpleType(parts[0]).WithAnnotation(tokenType);
+			AstType type = new SimpleType(parts[0]).WithAnnotation(tokenKind);
 			for (int i = 1; i < parts.Length; i++) {
-				type = new MemberType(type, parts[i]).WithAnnotation(tokenType);
+				type = new MemberType(type, parts[i]).WithAnnotation(tokenKind);
 			}
 			return type;
 		}

@@ -213,7 +213,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		public override void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null)
 		{
-			WritePrimitiveValue(value, tokenKind, literalValue, ref column, (a, b) => textWriter.Write(a), (a, b, c) => WriteToken(a, b, c));
+			WritePrimitiveValue(value, tokenKind, literalValue, ref column, (a, b) => textWriter.Write(a), WriteToken);
 		}
 		
 		public static void WritePrimitiveValue(object value, TextTokenKind? tokenKind, string literalValue, ref int column, Action<string, TextTokenKind> writer, Action<Role, string, TextTokenKind> writeToken)
@@ -242,9 +242,10 @@ namespace ICSharpCode.NRefactory.CSharp
 				}
 				return;
 			}
-			
-			if (value is string) {
-				string tmp = "\"" + ConvertString(value.ToString()) + "\"";
+
+			var s = value as string;
+			if (s != null) {
+				string tmp = "\"" + ConvertString(s) + "\"";
 				column += tmp.Length;
 				writer(tmp, TextTokenKind.String);
 			} else if (value is char) {
@@ -333,7 +334,7 @@ namespace ICSharpCode.NRefactory.CSharp
 				writer(b.ToString(), TextTokenKind.Number);
 				column += b.Length;
 			} else {
-				var s = value.ToString();
+				s = value.ToString();
 				writer(s, TextTokenKindUtils.GetTextTokenType(value));
 				column += s.Length;
 			}
@@ -386,18 +387,89 @@ namespace ICSharpCode.NRefactory.CSharp
 					}
 			}
 		}
+
+		static void AppendChar(StringBuilder sb, char ch)
+		{
+			switch (ch) {
+				case '\\':
+					sb.Append("\\\\");
+					break;
+				case '\0':
+					sb.Append("\\0");
+					break;
+				case '\a':
+					sb.Append("\\a");
+					break;
+				case '\b':
+					sb.Append("\\b");
+					break;
+				case '\f':
+					sb.Append("\\f");
+					break;
+				case '\n':
+					sb.Append("\\n");
+					break;
+				case '\r':
+					sb.Append("\\r");
+					break;
+				case '\t':
+					sb.Append("\\t");
+					break;
+				case '\v':
+					sb.Append("\\v");
+					break;
+				default:
+					if (char.IsControl(ch) || char.IsSurrogate(ch) ||
+					    // print all uncommon white spaces as numbers
+					    (char.IsWhiteSpace(ch) && ch != ' ')) {
+						sb.Append("\\u");
+						sb.Append(((int)ch).ToString("x4"));
+					} else {
+						sb.Append(ch);
+					}
+					break;
+			}
+		}
 		
 		/// <summary>
 		/// Converts special characters to escape sequences within the given string.
 		/// </summary>
 		public static string ConvertString(string str)
 		{
-			StringBuilder sb = new StringBuilder ();
-			foreach (char ch in str) {
+			int i = 0;
+			for (; ; i++) {
+				if (i >= str.Length)
+					return str;
+				char c = str[i];
+				switch (c) {
+				case '"':
+				case '\\':
+				case '\0':
+				case '\a':
+				case '\b':
+				case '\f':
+				case '\n':
+				case '\r':
+				case '\t':
+				case '\v':
+					goto escapeChars;
+				default:
+					if (char.IsControl(c) || char.IsSurrogate(c) || (char.IsWhiteSpace(c) && c != ' '))
+						goto escapeChars;
+					break;
+				}
+			}
+
+escapeChars:
+			StringBuilder sb = new StringBuilder();
+			if (i > 0)
+				sb.Append(str, 0, i);
+			for (; i < str.Length; i++) {
+				char ch = str[i];
 				if (ch == '"') {
 					sb.Append("\\\"");
 				} else {
-					sb.Append(ConvertChar(ch));
+					AppendChar(sb, ch);
 				}
 			}
 			return sb.ToString();

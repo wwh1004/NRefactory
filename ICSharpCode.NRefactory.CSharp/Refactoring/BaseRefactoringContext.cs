@@ -31,7 +31,6 @@ using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.CSharp.TypeSystem;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
-using ICSharpCode.NRefactory.TypeSystem.Implementation;
 using ICSharpCode.NRefactory.Editor;
 using System.ComponentModel.Design;
 using ICSharpCode.NRefactory.CSharp.Analysis;
@@ -39,8 +38,7 @@ using ICSharpCode.NRefactory.Utils;
 using System.Collections.Generic;
 using ICSharpCode.NRefactory.Analysis;
 
-namespace ICSharpCode.NRefactory.CSharp.Refactoring
-{
+namespace ICSharpCode.NRefactory.CSharp.Refactoring {
 	public abstract class BaseRefactoringContext : IServiceProvider
 	{
 		readonly CSharpAstResolver resolver;

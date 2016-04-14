@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using dnSpy.Decompiler.Shared;
 using ICSharpCode.NRefactory.TypeSystem;
 
 namespace ICSharpCode.NRefactory.CSharp {
@@ -274,7 +273,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		/// Does not support generics, arrays, etc. - just simple dotted names,
 		/// e.g. namespace names.
 		/// </summary>
-		public static AstType Create(string dottedName, TextTokenKind tokenKind)
+		public static AstType Create(string dottedName, object tokenKind)
 		{
 			string[] parts = dottedName.Split('.');
 			AstType type = new SimpleType(parts[0]).WithAnnotation(tokenKind);

@@ -18,7 +18,8 @@
 
 using System;
 using System.IO;
-using dnSpy.Decompiler.Shared;
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	public abstract class TokenWriter
@@ -29,7 +30,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		/// <summary>
 		/// Writes an identifier.
 		/// </summary>
-		public abstract void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind);
+		public abstract void WriteIdentifier(Identifier identifier, object data);
 		
 		/// <summary>
 		/// Writes a keyword to the output.
@@ -39,12 +40,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 		/// <summary>
 		/// Writes a token to the output.
 		/// </summary>
-		public abstract void WriteToken(Role role, string token, TextTokenKind tokenKind);
+		public abstract void WriteToken(Role role, string token, object data);
 		
 		/// <summary>
 		/// Writes a primitive/literal value
 		/// </summary>
-		public abstract void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null);
+		public abstract void WritePrimitiveValue(object value, object data = null, string literalValue = null);
 		
 		public abstract void WritePrimitiveType(string type);
 		
@@ -74,7 +75,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			return new InsertSpecialsDecorator(new InsertRequiredSpacesDecorator(new InsertMissingTokensDecorator(writer, (ILocatable)writer)));
 		}
 
-		public virtual void DebugStart(AstNode node, TextPosition? start)
+		public virtual void DebugStart(AstNode node, int? start)
 		{
 		}
 
@@ -86,36 +87,53 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 		}
 
-		public virtual void DebugEnd(AstNode node, TextPosition? end)
+		public virtual void DebugEnd(AstNode node, int? end)
 		{
 		}
 
 		// Don't use Location prop since it's used by ILocatable. We want that whoever can provide
 		// this value can do it so we can't check the writer to see if it implements ILocatable
-		public virtual TextPosition? GetLocation()
+		public virtual int? GetLocation()
 		{
 			return null;
 		}
 
 		public void WriteTokenOperator(Role tokenRole, string token)
 		{
-			WriteToken(tokenRole, token, TextTokenKind.Operator);
+			WriteToken(tokenRole, token, BoxedTextColor.Operator);
+		}
+
+		public void WriteTokenPunctuation(Role tokenRole, string token)
+		{
+			WriteToken(tokenRole, token, BoxedTextColor.Punctuation);
 		}
 
 		public void WriteTokenBrace(Role tokenRole, string token)
 		{
-			WriteToken(tokenRole, token, TextTokenKind.Brace);
+			WriteToken(tokenRole, token, BoxedTextColor.Punctuation);
 		}
 
 		public void WriteTokenNumber(Role tokenRole, string token)
 		{
-			WriteToken(tokenRole, token, TextTokenKind.Number);
+			WriteToken(tokenRole, token, BoxedTextColor.Number);
+		}
+
+		public virtual void AddHighlightedKeywordReference(object reference, int start, int end)
+		{
+		}
+
+		public virtual void AddBracePair(int leftStart, int leftEnd, int rightStart, int rightEnd, CodeBracesRangeFlags flags)
+		{
+		}
+
+		public virtual void AddLineSeparator(int position)
+		{
 		}
 	}
 	
 	public interface ILocatable
 	{
-		TextPosition Location { get; }
+		TextLocation Location { get; }
 	}
 	
 	public abstract class DecoratingTokenWriter : TokenWriter
@@ -139,9 +157,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.EndNode(node);
 		}
 		
-		public override void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
+		public override void WriteIdentifier(Identifier identifier, object data)
 		{
-			decoratedWriter.WriteIdentifier(identifier, tokenKind);
+			decoratedWriter.WriteIdentifier(identifier, data);
 		}
 		
 		public override void WriteKeyword(Role role, string keyword)
@@ -149,14 +167,14 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.WriteKeyword(role, keyword);
 		}
 		
-		public override void WriteToken(Role role, string token, TextTokenKind tokenKind)
+		public override void WriteToken(Role role, string token, object data)
 		{
-			decoratedWriter.WriteToken(role, token, tokenKind);
+			decoratedWriter.WriteToken(role, token, data);
 		}
 		
-		public override void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null)
+		public override void WritePrimitiveValue(object value, object data = null, string literalValue = null)
 		{
-			decoratedWriter.WritePrimitiveValue(value, tokenKind, literalValue);
+			decoratedWriter.WritePrimitiveValue(value, data, literalValue);
 		}
 		
 		public override void WritePrimitiveType(string type)
@@ -194,7 +212,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.WritePreProcessorDirective(type, argument);
 		}
 
-		public override void DebugStart(AstNode node, TextPosition? start)
+		public override void DebugStart(AstNode node, int? start)
 		{
 			decoratedWriter.DebugStart(node, start);
 		}
@@ -209,14 +227,29 @@ namespace ICSharpCode.NRefactory.CSharp {
 			decoratedWriter.DebugExpression(node);
 		}
 
-		public override void DebugEnd(AstNode node, TextPosition? end)
+		public override void DebugEnd(AstNode node, int? end)
 		{
 			decoratedWriter.DebugEnd(node, end);
 		}
 
-		public override TextPosition? GetLocation()
+		public override int? GetLocation()
 		{
 			return decoratedWriter.GetLocation();
+		}
+
+		public override void AddHighlightedKeywordReference(object reference, int start, int end)
+		{
+			decoratedWriter.AddHighlightedKeywordReference(reference, start, end);
+		}
+
+		public override void AddBracePair(int leftStart, int leftEnd, int rightStart, int rightEnd, CodeBracesRangeFlags flags)
+		{
+			decoratedWriter.AddBracePair(leftStart, leftEnd, rightStart, rightEnd, flags);
+		}
+
+		public override void AddLineSeparator(int position)
+		{
+			decoratedWriter.AddLineSeparator(position);
 		}
 	}
 }

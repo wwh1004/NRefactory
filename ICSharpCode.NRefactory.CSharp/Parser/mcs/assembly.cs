@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Security;
 using System.Security.Cryptography;
-using System.Security.Permissions;
 using Mono.Security.Cryptography;
 using Mono.CompilerServices.SymbolWriter;
 
@@ -31,8 +30,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 #endif
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	public interface IAssemblyDefinition
 	{
 		string FullName { get; }

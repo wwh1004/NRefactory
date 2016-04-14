@@ -25,10 +25,8 @@
 // THE SOFTWARE.
 using System;
 using System.Linq;
-using ICSharpCode.NRefactory.Editor;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	partial class FormattingVisitor : DepthFirstAstVisitor
 	{
 		public override void VisitExpressionStatement(ExpressionStatement expressionStatement)

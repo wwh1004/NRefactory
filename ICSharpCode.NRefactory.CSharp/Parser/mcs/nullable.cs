@@ -12,7 +12,6 @@
 // Copyright 2011 Xamarin Inc
 //
 
-using System;
 using SLE = System.Linq.Expressions;
 
 #if STATIC
@@ -20,9 +19,8 @@ using IKVM.Reflection.Emit;
 #else
 using System.Reflection.Emit;
 #endif
-	
-namespace ICSharpCode.NRefactory.MonoCSharp.Nullable
-{
+
+namespace ICSharpCode.NRefactory.MonoCSharp.Nullable {
 	public class NullableType : TypeExpr
 	{
 		readonly TypeSpec underlying;

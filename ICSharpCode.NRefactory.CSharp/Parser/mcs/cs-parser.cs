@@ -16,12 +16,10 @@
 //
 
 using System.Text;
-using System.IO;
 using System;
 using System.Collections.Generic;
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	/// <summary>
 	///    The C# Parser
 	/// </summary>
@@ -16505,8 +16503,8 @@ static string GetTokenName (int token)
 }
 #line default
 namespace yydebug {
-        using System;
-	 internal interface yyDebug {
+		using System;
+		internal interface yyDebug {
 		 void push (int state, Object value);
 		 void lex (int state, int token, string name, Object value);
 		 void shift (int from, int to, int errorFlag);
@@ -16761,10 +16759,10 @@ namespace yydebug {
   public const int yyErrorCode = 256;
  }
  namespace yyParser {
-  using System;
-  /** thrown for irrecoverable syntax errors and stack overflow.
-    */
-  internal class yyException : System.Exception {
+		using System;
+		/** thrown for irrecoverable syntax errors and stack overflow.
+		  */
+		internal class yyException : System.Exception {
     public yyException (string message) : base (message) {
     }
   }

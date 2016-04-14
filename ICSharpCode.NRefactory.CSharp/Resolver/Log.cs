@@ -16,13 +16,11 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace ICSharpCode.NRefactory.CSharp.Resolver
-{
+namespace ICSharpCode.NRefactory.CSharp.Resolver {
 	/// <summary>
 	/// Resolver logging helper.
 	/// Wraps System.Diagnostics.Debug so that resolver-specific logging can be enabled/disabled on demand.

@@ -12,8 +12,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Collections;
 
 #if STATIC
 using IKVM.Reflection;
@@ -23,8 +21,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 #endif
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	public class Await : ExpressionStatement
 	{
 		Expression expr;

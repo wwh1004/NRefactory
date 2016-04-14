@@ -24,13 +24,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Linq;
-using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp.Refactoring
-{
+namespace ICSharpCode.NRefactory.CSharp.Refactoring {
 	public class LambdaHelper
 	{
 		public static IType GetLambdaReturnType(RefactoringContext context, LambdaExpression lambda)

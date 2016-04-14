@@ -24,11 +24,8 @@ using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
 using System.Threading;
-using ICSharpCode.NRefactory.CSharp.Completion;
-using System.Collections.ObjectModel;
 
-namespace ICSharpCode.NRefactory.CSharp.Analysis
-{
+namespace ICSharpCode.NRefactory.CSharp.Analysis {
 	/// <summary>
 	/// C# Semantic highlighter.
 	/// </summary>

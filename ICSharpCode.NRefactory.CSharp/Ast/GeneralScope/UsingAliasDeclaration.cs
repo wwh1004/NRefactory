@@ -24,10 +24,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using dnSpy.Decompiler.Shared;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
+
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// using Alias = Import;
 	/// </summary>
@@ -81,7 +82,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		{
 			AddChild (Identifier.Create (alias), AliasRole);
 			var st = new SimpleType (nameSpace);
-			st.AddAnnotation (TextTokenKind.NamespacePart);
+			st.AddAnnotation (BoxedTextColor.Namespace);
 			AddChild (st, ImportRole);
 		}
 		

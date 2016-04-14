@@ -32,11 +32,9 @@ using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.Editor;
 using ICSharpCode.NRefactory.TypeSystem;
 using ICSharpCode.NRefactory.Semantics;
-using ICSharpCode.NRefactory.TypeSystem.Implementation;
 using ICSharpCode.NRefactory.CSharp.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp.Completion
-{
+namespace ICSharpCode.NRefactory.CSharp.Completion {
 	/// <summary>
 	/// Acts as a common base between code completion and parameter completion.
 	/// </summary>

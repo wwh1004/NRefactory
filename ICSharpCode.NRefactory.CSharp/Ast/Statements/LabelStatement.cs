@@ -24,10 +24,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using dnSpy.Decompiler.Shared;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
+
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// Label:
 	/// </summary>
@@ -39,7 +40,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			}
 			set {
 				var id = Identifier.Create (value);
-				id.AddAnnotation(TextTokenKind.Label);
+				id.AddAnnotation(BoxedTextColor.Label);
 				SetChildByRole(Roles.Identifier, id);
 			}
 		}

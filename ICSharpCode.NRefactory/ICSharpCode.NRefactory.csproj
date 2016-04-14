@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
     <ProjectGuid>{3B2A5653-EC97-4001-BB9B-D90F1AF2C371}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -20,67 +20,39 @@
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <WarningLevel>4</WarningLevel>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>1591,1685</NoWarn>
     <OutputPath>..\bin\$(Configuration)\</OutputPath>
     <NoWin32Manifest>False</NoWin32Manifest>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DocumentationFile>$(IntermediateOutputPath)ICSharpCode.NRefactory.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>465371136</BaseAddress>
     <FileAlignment>4096</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <StartAction>Project</StartAction>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Optimize>True</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
     <OutputPath>..\bin\Debug\</OutputPath>
-    <NoWarn>1591,1685</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>PdbOnly</DebugType>
-    <OutputPath>..\bin\Release\</OutputPath>
-    <NoWarn>1591,1685</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'net_4_5_Debug' ">
-    <Optimize>False</Optimize>
-    <DefineConstants>DEBUG;TRACE;NET_4_5</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;NET_4_5;NET_4_6</DefineConstants>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <StartAction>Project</StartAction>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'net_4_5_Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <OutputPath>..\bin\net_4_5_Debug\</OutputPath>
-    <NoWarn>1591,1685</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'net_4_5_Release' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>465371136</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
     <Optimize>True</Optimize>
-    <DefineConstants>TRACE;NET_4_5</DefineConstants>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>TRACE;NET_4_5;NET_4_6</DefineConstants>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'net_4_5_Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <OutputPath>..\bin\net_4_5_Release\</OutputPath>
-    <NoWarn>1591,1685</NoWarn>
+    <DebugType>PdbOnly</DebugType>
+    <OutputPath>..\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -301,13 +273,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\dnlib\src\dnlib.csproj">
+    <ProjectReference Include="..\..\..\..\Libraries\dnlib\src\dnlib.csproj">
       <Project>{FDFC1237-143F-4919-8318-4926901F4639}</Project>
       <Name>dnlib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\dnSpy.Decompiler.Shared\dnSpy.Decompiler.Shared.csproj">
-      <Project>{a027546a-cf4b-47f9-bc53-ee1ad424ee41}</Project>
-      <Name>dnSpy.Decompiler.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

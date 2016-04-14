@@ -24,11 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Collections.Generic;
-using System.Linq;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	public class VariableDeclarationStatement : Statement
 	{
 		public static readonly Role<CSharpModifierToken> ModifierRole = EntityDeclaration.ModifierRole;

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
-using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	class InsertRequiredSpacesDecorator : DecoratingTokenWriter
@@ -44,7 +43,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 		}
 		
-		public override void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
+		public override void WriteIdentifier(Identifier identifier, object data)
 		{
 			if (identifier.IsVerbatim || CSharpOutputVisitor.IsKeyword(identifier.Name, identifier)) {
 				if (lastWritten == LastWritten.KeywordOrIdentifier) {
@@ -55,7 +54,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				// this space is strictly required, so we directly call the formatter
 				base.Space();
 			}
-			base.WriteIdentifier(identifier, tokenKind);
+			base.WriteIdentifier(identifier, data);
 			lastWritten = LastWritten.KeywordOrIdentifier;
 		}
 		
@@ -68,7 +67,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			lastWritten = LastWritten.KeywordOrIdentifier;
 		}
 		
-		public override void WriteToken(Role role, string token, TextTokenKind tokenKind)
+		public override void WriteToken(Role role, string token, object data)
 		{
 			// Avoid that two +, - or ? tokens are combined into a ++, -- or ?? token.
 			// Note that we don't need to handle tokens like = because there's no valid
@@ -83,7 +82,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			    lastWritten == LastWritten.Division && token[0] == '*') {
 				base.Space();
 			}
-			base.WriteToken(role, token, tokenKind);
+			base.WriteToken(role, token, data);
 			if (token == "+") {
 				lastWritten = LastWritten.Plus;
 			} else if (token == "-") {
@@ -128,9 +127,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			lastWritten = LastWritten.Whitespace;
 		}
 		
-		public override void WritePrimitiveValue(object value, TextTokenKind? tokenKind = null, string literalValue = null)
+		public override void WritePrimitiveValue(object value, object data = null, string literalValue = null)
 		{
-			base.WritePrimitiveValue(value, tokenKind, literalValue);
+			base.WritePrimitiveValue(value, data, literalValue);
 			if (value == null || value is bool)
 				return;
 			if (value is string) {

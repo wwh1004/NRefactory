@@ -26,7 +26,11 @@
 
 using System;
 using System.Collections.Generic;
-using dnSpy.Decompiler.Shared;
+using System.Text;
+using System.Threading;
+using dnlib.DotNet;
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
@@ -57,19 +61,31 @@ namespace ICSharpCode.NRefactory.CSharp {
 				return UsingDeclaration.ConstructNamespace(NamespaceName);
 			}
 			set {
-				var arr = value.Split('.');
-				NamespaceName = ConstructType(arr, arr.Length - 1, TextTokenKind.NamespacePart);
+				NamespaceName = CreateNamespaceNameType(value, new AssemblyRefUser());
 			}
 		}
 
-		static AstType ConstructType(string[] arr, int i, TextTokenKind tokenKind)
+		static AstType CreateNamespaceNameType(string ns, IAssembly asm)
 		{
-			if (i < 0 || i >= arr.Length)
-				throw new ArgumentOutOfRangeException("i");
-			if (i == 0)
-				return new SimpleType(arr[i]).WithAnnotation(tokenKind);
-			return new MemberType(ConstructType(arr, i - 1, TextTokenKind.NamespacePart), arr[i]).WithAnnotation(tokenKind);
+			var sb = Interlocked.CompareExchange(ref cachedStringBuilder, null, cachedStringBuilder) ?? new StringBuilder();
+			string[] parts = ns.Split('.');
+			var nsAsm = asm;
+			sb.Clear();
+			sb.Append(parts[0]);
+			SimpleType simpleType;
+			AstType nsType = simpleType = new SimpleType(parts[0]).WithAnnotation(BoxedTextColor.Namespace);
+			simpleType.IdentifierToken.WithAnnotation(BoxedTextColor.Namespace).WithAnnotation(new NamespaceReference(nsAsm, parts[0]));
+			for (int i = 1; i < parts.Length; i++) {
+				sb.Append('.');
+				sb.Append(parts[i]);
+				var nsPart = sb.ToString();
+				nsType = new MemberType { Target = nsType, MemberNameToken = Identifier.Create(parts[i]).WithAnnotation(BoxedTextColor.Namespace).WithAnnotation(new NamespaceReference(nsAsm, nsPart)) }.WithAnnotation(BoxedTextColor.Namespace);
+			}
+			if (sb.Capacity <= 1000)
+				cachedStringBuilder = sb;
+			return nsType;
 		}
+		static StringBuilder cachedStringBuilder = new StringBuilder();
 
 		/// <summary>
 		/// Gets the full namespace name (including any parent namespaces)
@@ -98,6 +114,21 @@ namespace ICSharpCode.NRefactory.CSharp {
 			}
 		}
 
+		public IEnumerable<Identifier> IdentifierTypes {
+			get {
+				var result = new Stack<Identifier>();
+				AstType type = NamespaceName;
+				while (type is MemberType) {
+					var mt = (MemberType)type;
+					result.Push(mt.MemberNameToken);
+					type = mt.Target;
+				}
+				if (type is SimpleType)
+					result.Push(((SimpleType)type).IdentifierToken);
+				return result;
+			}
+		}
+
 		public CSharpTokenNode LBraceToken {
 			get { return GetChildByRole(Roles.LBrace); }
 		}
@@ -117,6 +148,11 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public NamespaceDeclaration(string name)
 		{
 			this.Name = name;
+		}
+
+		public NamespaceDeclaration(string name, IAssembly asm)
+		{
+			NamespaceName = CreateNamespaceNameType(name, asm);
 		}
 
 		public static string BuildQualifiedName(string name1, string name2)

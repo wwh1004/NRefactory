@@ -26,11 +26,9 @@
 using ICSharpCode.NRefactory.Editor;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	///     Indentation engine based on a state machine.
 	///     Supports only pushing new chars to the end.

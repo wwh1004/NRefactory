@@ -26,10 +26,8 @@
 using ICSharpCode.NRefactory.Editor;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	///     Represents a decorator of an IStateMachineIndentEngine instance that provides
 	///     logic for reseting and updating the engine on text changed events.

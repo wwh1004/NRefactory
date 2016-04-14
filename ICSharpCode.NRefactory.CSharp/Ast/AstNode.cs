@@ -25,16 +25,13 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	public abstract class AstNode : AbstractAnnotatable, ICSharpCode.NRefactory.TypeSystem.IFreezable, PatternMatching.INode, ICloneable
 	{
 		// the Root role must be available when creating the null nodes, so we can't put it in the Roles class

@@ -21,7 +21,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using dnSpy.Decompiler.Shared;
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	public class QueryExpressionExpansionResult {
@@ -144,7 +145,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 						TransparentIdentifierNamePicker.MoveNext();
 					}
 					string name = TransparentIdentifierNamePicker.Current;
-					param.AddChild(Identifier.Create(name).WithAnnotation(TextTokenKind.Parameter), Roles.Identifier);
+					param.AddChild(Identifier.Create(name).WithAnnotation(BoxedTextColor.Parameter), Roles.Identifier);
 				}
 				return param;
 			}
@@ -250,14 +251,14 @@ namespace ICSharpCode.NRefactory.CSharp {
 						return VisitNested(ParenthesizeIfNeeded(queryFromClause.Expression), null);
 					}
 					else {
-						return VisitNested(ParenthesizeIfNeeded(queryFromClause.Expression), null).Invoke(TextTokenKind.ExtensionMethod, "Cast", new[] { queryFromClause.Type.Clone() }, new Expression[0]);
+						return VisitNested(ParenthesizeIfNeeded(queryFromClause.Expression), null).Invoke(BoxedTextColor.ExtensionMethod, "Cast", new[] { queryFromClause.Type.Clone() }, new Expression[0]);
 					}
 				}
 				else {
 					var innerSelectorParam = CreateParameterForCurrentRangeVariable();
 					var lambdaContent = VisitNested(queryFromClause.Expression, innerSelectorParam);
 					if (!queryFromClause.Type.IsNull) {
-						lambdaContent = lambdaContent.Invoke(TextTokenKind.ExtensionMethod, "Cast", new[] { queryFromClause.Type.Clone() }, new Expression[0]);
+						lambdaContent = lambdaContent.Invoke(BoxedTextColor.ExtensionMethod, "Cast", new[] { queryFromClause.Type.Clone() }, new Expression[0]);
 					}
 					var innerSelector = CreateLambda(new[] { innerSelectorParam }, lambdaContent);
 
@@ -279,7 +280,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					var resultSelector = CreateLambda(new[] { resultParam, resultSelectorParam2 }, body);
 					rangeVariables[queryFromClause.IdentifierToken] = resultSelectorParam2;
 
-					return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "SelectMany", innerSelector, resultSelector);
+					return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "SelectMany", innerSelector, resultSelector);
 				}
 			}
 
@@ -288,19 +289,19 @@ namespace ICSharpCode.NRefactory.CSharp {
 				var body = AddMemberToCurrentTransparentType(param, queryLetClause.IdentifierToken, queryLetClause.Expression, true);
 				var lambda = CreateLambda(new[] { param }, body);
 
-				return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "Select", lambda);
+				return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "Select", lambda);
 			}
 
 			public override AstNode VisitQueryWhereClause(QueryWhereClause queryWhereClause) {
 				var param = CreateParameterForCurrentRangeVariable();
-				return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "Where", CreateLambda(new[] { param }, VisitNested(queryWhereClause.Condition, param)));
+				return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "Where", CreateLambda(new[] { param }, VisitNested(queryWhereClause.Condition, param)));
 			}
 
 			public override AstNode VisitQueryJoinClause(QueryJoinClause queryJoinClause) {
 				Expression resultSelectorBody = null;
 				var inExpression = VisitNested(queryJoinClause.InExpression, null);
 				if (!queryJoinClause.Type.IsNull) {
-					inExpression = inExpression.Invoke(TextTokenKind.ExtensionMethod, "Cast", new[] { queryJoinClause.Type.Clone() }, EmptyList<Expression>.Instance);
+					inExpression = inExpression.Invoke(BoxedTextColor.ExtensionMethod, "Cast", new[] { queryJoinClause.Type.Clone() }, EmptyList<Expression>.Instance);
 				}
 				var key1SelectorFirstParam = CreateParameterForCurrentRangeVariable();
 				var key1Selector = CreateLambda(new[] { key1SelectorFirstParam }, VisitNested(queryJoinClause.OnExpression, key1SelectorFirstParam));
@@ -322,7 +323,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 
 					var resultSelector = CreateLambda(new[] { resultSelectorFirstParam, CreateParameter((Identifier)queryJoinClause.JoinIdentifierToken.Clone()) }, resultSelectorBody);
 					rangeVariables[queryJoinClause.JoinIdentifierToken] = key2Param;
-					return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "Join", inExpression, key1Selector, key2Selector, resultSelector);
+					return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "Join", inExpression, key1Selector, key2Selector, resultSelector);
 				}
 				else {
 					// Group join
@@ -333,7 +334,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					var resultSelector = CreateLambda(new[] { resultSelectorFirstParam, intoParam }, resultSelectorBody);
 					rangeVariables[queryJoinClause.IntoIdentifierToken] = intoParam;
 
-					return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "GroupJoin", inExpression, key1Selector, key2Selector, resultSelector);
+					return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "GroupJoin", inExpression, key1Selector, key2Selector, resultSelector);
 				}
 			}
 
@@ -345,7 +346,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					                          : (o.Direction == QueryOrderingDirection.Descending ? "ThenByDescending" : "ThenBy");
 
 					var param = CreateParameterForCurrentRangeVariable();
-					current = current.Invoke2(TextTokenKind.ExtensionMethod, methodName, CreateLambda(new[] { param }, VisitNested(o.Expression, param)));
+					current = current.Invoke2(BoxedTextColor.ExtensionMethod, methodName, CreateLambda(new[] { param }, VisitNested(o.Expression, param)));
 					MapExpression(o, current);
 					first = false;
 				}
@@ -371,7 +372,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 
 				var param = CreateParameterForCurrentRangeVariable();
 				var lambda = CreateLambda(new[] { param }, VisitNested(querySelectClause.Expression, param));
-				return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "Select", lambda);
+				return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "Select", lambda);
 			}
 
 			public override AstNode VisitQueryGroupClause(QueryGroupClause queryGroupClause) {
@@ -380,12 +381,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 
 				if (IsSingleRangeVariable(queryGroupClause.Projection)) {
 					// We are grouping by the single active range variable, so we can use the single argument form of GroupBy
-					return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "GroupBy", keyLambda);
+					return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "GroupBy", keyLambda);
 				}
 				else {
 					var projectionParam = CreateParameterForCurrentRangeVariable();
 					var projectionLambda = CreateLambda(new[] { projectionParam }, VisitNested(queryGroupClause.Projection, projectionParam));
-					return currentResult.Invoke2(TextTokenKind.ExtensionMethod, "GroupBy", keyLambda, projectionLambda);
+					return currentResult.Invoke2(BoxedTextColor.ExtensionMethod, "GroupBy", keyLambda, projectionLambda);
 				}
 			}
 

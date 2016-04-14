@@ -18,16 +18,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
 using ICSharpCode.NRefactory.TypeSystem.Implementation;
-using ICSharpCode.NRefactory.Utils;
 
-namespace ICSharpCode.NRefactory.CSharp.TypeSystem
-{
+namespace ICSharpCode.NRefactory.CSharp.TypeSystem {
 	/// <summary>
 	/// Represents a simple C# name. (a single non-qualified identifier with an optional list of type arguments)
 	/// </summary>

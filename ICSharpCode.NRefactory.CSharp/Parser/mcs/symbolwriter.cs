@@ -16,14 +16,12 @@ using System;
 using IKVM.Reflection;
 using IKVM.Reflection.Emit;
 #else
-using System.Reflection;
 using System.Reflection.Emit;
 #endif
 
 using Mono.CompilerServices.SymbolWriter;
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	static class SymbolWriter
 	{
 #if !NET_4_0 && !STATIC

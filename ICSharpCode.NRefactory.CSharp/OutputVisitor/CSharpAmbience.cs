@@ -18,12 +18,12 @@
 
 using System;
 using System.IO;
-using dnSpy.Decompiler.Shared;
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
 using ICSharpCode.NRefactory.CSharp.Refactoring;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// C# ambience. Used to convert type system symbols to text (usually for displaying the symbol to the user; e.g. in editor tooltips)
 	/// </summary>
@@ -113,21 +113,21 @@ namespace ICSharpCode.NRefactory.CSharp
 			else if (symbol is IMember)
 				WriteMemberDeclarationName((IMember)symbol, writer, formattingPolicy);
 			else
-				writer.WriteIdentifier(Identifier.Create(symbol.Name), TextTokenKind.Text);
+				writer.WriteIdentifier(Identifier.Create(symbol.Name), BoxedTextColor.Text);
 			
 			if ((ConversionFlags & ConversionFlags.ShowParameterList) == ConversionFlags.ShowParameterList && HasParameters(symbol)) {
-				writer.WriteTokenOperator(symbol.SymbolKind == SymbolKind.Indexer ? Roles.LBracket : Roles.LPar, symbol.SymbolKind == SymbolKind.Indexer ? "[" : "(");
+				writer.WriteTokenPunctuation(symbol.SymbolKind == SymbolKind.Indexer ? Roles.LBracket : Roles.LPar, symbol.SymbolKind == SymbolKind.Indexer ? "[" : "(");
 				bool first = true;
 				foreach (var param in node.GetChildrenByRole(Roles.Parameter)) {
 					if (first) {
 						first = false;
 					} else {
-						writer.WriteTokenOperator(Roles.Comma, ",");
+						writer.WriteTokenPunctuation(Roles.Comma, ",");
 						writer.Space();
 					}
 					param.AcceptVisitor(new CSharpOutputVisitor(writer, formattingPolicy));
 				}
-				writer.WriteTokenOperator(symbol.SymbolKind == SymbolKind.Indexer ? Roles.RBracket : Roles.RPar, symbol.SymbolKind == SymbolKind.Indexer ? "]" : ")");
+				writer.WriteTokenPunctuation(symbol.SymbolKind == SymbolKind.Indexer ? Roles.RBracket : Roles.RPar, symbol.SymbolKind == SymbolKind.Indexer ? "]" : ")");
 			}
 			
 			if ((ConversionFlags & ConversionFlags.ShowBody) == ConversionFlags.ShowBody && !(node is TypeDeclaration)) {
@@ -138,17 +138,17 @@ namespace ICSharpCode.NRefactory.CSharp
 					writer.Space();
 					if (property.CanGet) {
 						writer.WriteKeyword(PropertyDeclaration.GetKeywordRole, "get");
-						writer.WriteTokenOperator(Roles.Semicolon, ";");
+						writer.WriteTokenPunctuation(Roles.Semicolon, ";");
 						writer.Space();
 					}
 					if (property.CanSet) {
 						writer.WriteKeyword(PropertyDeclaration.SetKeywordRole, "set");
-						writer.WriteTokenOperator(Roles.Semicolon, ";");
+						writer.WriteTokenPunctuation(Roles.Semicolon, ";");
 						writer.Space();
 					}
 					writer.WriteTokenBrace(Roles.RBrace, "}");
 				} else {
-					writer.WriteTokenOperator(Roles.Semicolon, ";");
+					writer.WriteTokenPunctuation(Roles.Semicolon, ";");
 				}
 			}
 		}
@@ -193,10 +193,10 @@ namespace ICSharpCode.NRefactory.CSharp
 					writer.WriteTokenOperator(Roles.Dot, ".");
 				}
 			}
-			writer.WriteIdentifier(node.NameToken, TextTokenKind.Text);
+			writer.WriteIdentifier(node.NameToken, BoxedTextColor.Text);
 			if ((ConversionFlags & ConversionFlags.ShowTypeParameterList) == ConversionFlags.ShowTypeParameterList) {
 				var outputVisitor = new CSharpOutputVisitor(writer, formattingPolicy);
-				outputVisitor.WriteTypeParameters(node.GetChildrenByRole(Roles.TypeParameter));
+				outputVisitor.WriteTypeParameters(node.GetChildrenByRole(Roles.TypeParameter), CodeBracesRangeFlags.AngleBrackets);
 			}
 		}
 		
@@ -240,19 +240,19 @@ namespace ICSharpCode.NRefactory.CSharp
 							writer.Space();
 							var operatorType = OperatorDeclaration.GetOperatorType(member.Name);
 							if (operatorType.HasValue)
-								writer.WriteToken(OperatorDeclaration.GetRole(operatorType.Value), OperatorDeclaration.GetToken(operatorType.Value), TextTokenKind.Text);
+								writer.WriteToken(OperatorDeclaration.GetRole(operatorType.Value), OperatorDeclaration.GetToken(operatorType.Value), BoxedTextColor.Text);
 							else
-								writer.WriteIdentifier(node.NameToken, TextTokenKind.Text);
+								writer.WriteIdentifier(node.NameToken, BoxedTextColor.Text);
 							break;
 					}
 					break;
 				default:
-					writer.WriteIdentifier(Identifier.Create(member.Name), TextTokenKind.Text);
+					writer.WriteIdentifier(Identifier.Create(member.Name), BoxedTextColor.Text);
 					break;
 			}
 			if ((ConversionFlags & ConversionFlags.ShowTypeParameterList) == ConversionFlags.ShowTypeParameterList && member.SymbolKind == SymbolKind.Method) {
 				var outputVisitor = new CSharpOutputVisitor(writer, formattingPolicy);
-				outputVisitor.WriteTypeParameters(node.GetChildrenByRole(Roles.TypeParameter));
+				outputVisitor.WriteTypeParameters(node.GetChildrenByRole(Roles.TypeParameter), CodeBracesRangeFlags.AngleBrackets);
 			}
 		}
 		
@@ -268,7 +268,7 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		void WriteQualifiedName(string name, TokenWriter writer, CSharpFormattingOptions formattingPolicy)
 		{
-			var node = AstType.Create(name, TextTokenKind.Text);
+			var node = AstType.Create(name, BoxedTextColor.Text);
 			var outputVisitor = new CSharpOutputVisitor(writer, formattingPolicy);
 			node.AcceptVisitor(outputVisitor);
 		}

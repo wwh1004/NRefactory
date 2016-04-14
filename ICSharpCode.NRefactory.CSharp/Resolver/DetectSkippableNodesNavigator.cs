@@ -16,13 +16,11 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp.Resolver
-{
+namespace ICSharpCode.NRefactory.CSharp.Resolver {
 	/// <summary>
 	/// When an <see cref="IResolveVisitorNavigator"/> is searching for specific nodes
 	/// (e.g. all IdentifierExpressions), it has to scan the whole syntax tree for those nodes.

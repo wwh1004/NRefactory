@@ -35,12 +35,9 @@ using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
 using ICSharpCode.NRefactory.CSharp.Refactoring;
-using ICSharpCode.NRefactory.PatternMatching;
-using ICSharpCode.NRefactory.CSharp;
 using ICSharpCode.NRefactory.Utils;
 
-namespace ICSharpCode.NRefactory.CSharp.Analysis
-{
+namespace ICSharpCode.NRefactory.CSharp.Analysis {
 	public class NullValueAnalysis
 	{
 		sealed class VariableStatusInfo : IEquatable<VariableStatusInfo>, IEnumerable<KeyValuePair<string, NullValueStatus>>

@@ -27,10 +27,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using dnSpy.Decompiler.Shared;
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// Left Operator Right
 	/// </summary>
@@ -230,7 +230,7 @@ namespace ICSharpCode.NRefactory.CSharp
 			MemberReferenceExpression mre = new MemberReferenceExpression();
 			mre.Target = new ParenthesizedExpression(this);
 			mre.MemberName = methodName;
-			mre.MemberNameToken.AddAnnotation(annotation ?? TextTokenKind.InstanceMethod);
+			mre.MemberNameToken.AddAnnotation(annotation ?? BoxedTextColor.InstanceMethod);
 			mre.TypeArguments.AddRange(typeArguments);
 			ie.Target = mre;
 			ie.Arguments.AddRange(arguments);

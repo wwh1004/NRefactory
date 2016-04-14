@@ -25,13 +25,11 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	public class EventDeclaration : EntityDeclaration
 	{
 		public static readonly TokenRole EventKeywordRole = new TokenRole ("event");

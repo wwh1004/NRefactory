@@ -23,11 +23,9 @@
 #if STATIC
 using IKVM.Reflection.Emit;
 #else
-using System.Reflection.Emit;
 #endif
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	public interface ILiteralConstant
 	{
 #if FULL_AST

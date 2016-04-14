@@ -20,13 +20,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using ICSharpCode.NRefactory.TypeSystem;
 using ICSharpCode.NRefactory.TypeSystem.Implementation;
 using ICSharpCode.NRefactory.Utils;
 
-namespace ICSharpCode.NRefactory.CSharp.TypeSystem
-{
+namespace ICSharpCode.NRefactory.CSharp.TypeSystem {
 	public class CSharpAssembly : IAssembly
 	{
 		readonly ICompilation compilation;

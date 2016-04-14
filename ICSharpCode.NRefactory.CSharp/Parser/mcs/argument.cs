@@ -10,7 +10,6 @@
 // Copyright 2011 Xamarin Inc
 //
 
-using System;
 using System.Collections.Generic;
 
 #if STATIC
@@ -19,8 +18,7 @@ using IKVM.Reflection.Emit;
 using System.Reflection.Emit;
 #endif
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	//
 	// Argument expression used for invocation
 	//

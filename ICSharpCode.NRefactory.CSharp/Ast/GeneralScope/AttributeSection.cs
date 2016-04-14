@@ -24,7 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using dnSpy.Decompiler.Shared;
+
+using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.Text;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
@@ -94,7 +96,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			}
 			set {
 				var id = CSharp.Identifier.Create (value);
-				id.AddAnnotation (TextTokenKind.Keyword);
+				id.AddAnnotation (BoxedTextColor.Keyword);
 				SetChildByRole (Roles.Identifier, id);
 			}
 		}

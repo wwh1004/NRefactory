@@ -14,8 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security;
-using System.Security.Permissions;
 using System.Text;
 using System.Linq;
 using Mono.CompilerServices.SymbolWriter;
@@ -24,7 +22,6 @@ using System.Runtime.CompilerServices;
 #if NET_2_1
 using XmlElement = System.Object;
 #else
-using System.Xml;
 #endif
 
 #if STATIC

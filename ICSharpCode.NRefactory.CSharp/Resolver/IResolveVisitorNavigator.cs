@@ -16,12 +16,10 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp.Resolver
-{
+namespace ICSharpCode.NRefactory.CSharp.Resolver {
 	/// <summary>
 	/// Allows controlling which nodes are resolved by the resolve visitor.
 	/// </summary>

@@ -10,11 +10,9 @@
 // Copyright 2011 Xamarin Inc
 //
 
-using System;
 using System.Diagnostics;
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	public abstract class StructuralVisitor
 	{
 		public virtual void Visit (MemberCore member)

@@ -25,10 +25,8 @@
 // THE SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	public class CSharpModifierToken : CSharpTokenNode
 	{
 		Modifiers modifier;

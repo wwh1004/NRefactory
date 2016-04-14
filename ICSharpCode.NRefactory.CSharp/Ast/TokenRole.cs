@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// A specific role only used for C# tokens
 	/// </summary>

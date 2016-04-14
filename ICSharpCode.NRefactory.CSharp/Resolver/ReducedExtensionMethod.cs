@@ -27,10 +27,8 @@ using System;
 using ICSharpCode.NRefactory.TypeSystem;
 using System.Collections.Generic;
 using System.Linq;
-using ICSharpCode.NRefactory.TypeSystem.Implementation;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// An invocated extension method hides the extension parameter in its parameter list.
 	/// It's used to hide the internals of extension method invocation in certain situation to simulate the

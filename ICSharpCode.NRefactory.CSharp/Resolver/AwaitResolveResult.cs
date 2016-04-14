@@ -18,13 +18,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace ICSharpCode.NRefactory.CSharp.Resolver
-{
+namespace ICSharpCode.NRefactory.CSharp.Resolver {
 	/// <summary>
 	/// Represents the result of an await expression.
 	/// </summary>

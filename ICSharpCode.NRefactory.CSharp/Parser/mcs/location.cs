@@ -14,10 +14,8 @@ using System;
 using System.Collections.Generic;
 using Mono.CompilerServices.SymbolWriter;
 using System.Diagnostics;
-using System.Linq;
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	//
 	//  This is one single source file.
 	//

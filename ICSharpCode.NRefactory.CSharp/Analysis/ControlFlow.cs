@@ -24,12 +24,10 @@ using System.Threading;
 using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.CSharp.TypeSystem;
 using ICSharpCode.NRefactory.Semantics;
-using ICSharpCode.NRefactory.TypeSystem;
 using ICSharpCode.NRefactory.TypeSystem.Implementation;
 using ICSharpCode.NRefactory.Utils;
 
-namespace ICSharpCode.NRefactory.CSharp.Analysis
-{
+namespace ICSharpCode.NRefactory.CSharp.Analysis {
 	/// <summary>
 	/// Represents a node in the control flow graph of a C# method.
 	/// </summary>

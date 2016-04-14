@@ -13,17 +13,12 @@
 //
 
 using System;
-using System.Reflection;
 using System.Reflection.Emit;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Globalization;
 using System.Diagnostics;
-using System.Threading;
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	/// <summary>
 	///    The compiler driver.
 	/// </summary>

@@ -16,10 +16,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Diagnostics;
-using System.Collections;
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	//
 	// This class has to be used by parser only, it reuses token
 	// details once a file is parsed

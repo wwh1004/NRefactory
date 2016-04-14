@@ -28,13 +28,9 @@ using System;
 using System.Text;
 using System.Linq;
 using ICSharpCode.NRefactory.Editor;
-using ICSharpCode.NRefactory.TypeSystem;
 using System.Threading;
-using System.Collections.Generic;
-using ICSharpCode.NRefactory.Utils;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	[Obsolete("This class was replaced by CSharpFormatter.")]
 	public class AstFormattingVisitor {}
 

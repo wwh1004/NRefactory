@@ -31,7 +31,6 @@
 using System;
 using System.Security.Cryptography;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 //
@@ -68,8 +67,7 @@ using System.IO;
 // changing the file format.
 //
 
-namespace Mono.CompilerServices.SymbolWriter
-{
+namespace Mono.CompilerServices.SymbolWriter {
 	public class OffsetTable
 	{
 		public const int  MajorVersion = 50;

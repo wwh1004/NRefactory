@@ -10,7 +10,6 @@
 //
 
 using System;
-using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -24,8 +23,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 #endif
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	public abstract class MetadataImporter
 	{
 		//

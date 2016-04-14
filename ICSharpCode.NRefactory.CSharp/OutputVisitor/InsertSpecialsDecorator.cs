@@ -18,7 +18,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using dnSpy.Decompiler.Shared;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	class InsertSpecialsDecorator : DecoratingTokenWriter
@@ -55,16 +54,16 @@ namespace ICSharpCode.NRefactory.CSharp {
 			base.WriteKeyword(role, keyword);
 		}
 		
-		public override void WriteIdentifier(Identifier identifier, TextTokenKind tokenKind)
+		public override void WriteIdentifier(Identifier identifier, object data)
 		{
 			WriteSpecialsUpToRole(identifier.Role ?? Roles.Identifier);
-			base.WriteIdentifier(identifier, tokenKind);
+			base.WriteIdentifier(identifier, data);
 		}
 		
-		public override void WriteToken(Role role, string token, TextTokenKind tokenKind)
+		public override void WriteToken(Role role, string token, object data)
 		{
 			WriteSpecialsUpToRole(role);
-			base.WriteToken(role, token, tokenKind);
+			base.WriteToken(role, token, data);
 		}
 		
 		public override void NewLine()

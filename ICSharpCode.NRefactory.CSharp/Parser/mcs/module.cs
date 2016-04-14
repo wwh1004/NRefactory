@@ -14,7 +14,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Mono.CompilerServices.SymbolWriter;
 using System.Linq;
 
 #if STATIC
@@ -25,8 +24,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 #endif
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	//
 	// Module (top-level type) container
 	//

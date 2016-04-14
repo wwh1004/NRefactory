@@ -16,8 +16,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Security;
-using System.Security.Permissions;
 using System.Text;
 using System.Diagnostics;
 using Mono.CompilerServices.SymbolWriter;
@@ -36,8 +34,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 #endif
 
-namespace ICSharpCode.NRefactory.MonoCSharp
-{
+namespace ICSharpCode.NRefactory.MonoCSharp {
 	//
 	// General types container, used as a base class for all constructs which can hold types
 	//

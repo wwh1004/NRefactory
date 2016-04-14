@@ -25,14 +25,11 @@
 // THE SOFTWARE.
 using System;
 using ICSharpCode.NRefactory.Editor;
-using System.Threading;
 using System.Linq;
 using ICSharpCode.NRefactory.CSharp.Refactoring;
-using ICSharpCode.NRefactory.TypeSystem;
 using System.Collections.Generic;
 
-namespace ICSharpCode.NRefactory.CSharp
-{
+namespace ICSharpCode.NRefactory.CSharp {
 	/// <summary>
 	/// The formatting changes are used to format a specific region inside a document and apply a minimal formatting
 	/// changeset to a given document. This is useful for a text editor environment.

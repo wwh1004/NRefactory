@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using dnlib.DotNet;
 using dnSpy.Contracts.Decompiler;
 using dnSpy.Contracts.Text;
 using ICSharpCode.NRefactory.PatternMatching;
@@ -124,6 +125,17 @@ namespace ICSharpCode.NRefactory.CSharp {
 				if (flags != 0)
 					owner.writer.AddBracePair(leftStart, leftEnd, rightStart, rightEnd, flags);
 			}
+		}
+
+		static CodeBracesRangeFlags GetTypeBlockKind(AstNode node) {
+			var td = node.Annotation<TypeDef>();
+			if (td != null) {
+				if (td.IsInterface)
+					return CodeBracesRangeFlags.InterfaceBraces;
+				if (td.IsValueType)
+					return CodeBracesRangeFlags.ValueTypeBraces;
+			}
+			return CodeBracesRangeFlags.TypeBraces;
 		}
 
 		public CSharpOutputVisitor (TextWriter textWriter, CSharpFormattingOptions formattingPolicy)
@@ -1559,7 +1571,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				}
 				constraint.AcceptVisitor(this);
 			}
-			var braceHelper = OpenBrace(braceStyle, CodeBracesRangeFlags.TypeBraces);
+			var braceHelper = OpenBrace(braceStyle, GetTypeBlockKind(typeDeclaration));
 			if (typeDeclaration.ClassType == ClassType.Enum) {
 				bool first = true;
 				AstNode last = null;
@@ -1662,32 +1674,31 @@ namespace ICSharpCode.NRefactory.CSharp {
 			CodeBracesRangeFlags flags;
 			if (blockStatement.Parent is AnonymousMethodExpression || blockStatement.Parent is LambdaExpression) {
 				style = policy.AnonymousMethodBraceStyle;
-				flags = CodeBracesRangeFlags.MethodBraces;
+				flags = CodeBracesRangeFlags.AnonymousMethodBraces;
 			} else if (blockStatement.Parent is ConstructorDeclaration) {
 				style = policy.ConstructorBraceStyle;
-				flags = CodeBracesRangeFlags.MethodBraces;
+				flags = CodeBracesRangeFlags.ConstructorBraces;
 			} else if (blockStatement.Parent is DestructorDeclaration) {
 				style = policy.DestructorBraceStyle;
-				flags = CodeBracesRangeFlags.MethodBraces;
+				flags = CodeBracesRangeFlags.DestructorBraces;
+			} else if (blockStatement.Parent is OperatorDeclaration) {
+				style = policy.MethodBraceStyle;
+				flags = CodeBracesRangeFlags.OperatorBraces;
 			} else if (blockStatement.Parent is MethodDeclaration) {
 				style = policy.MethodBraceStyle;
 				flags = CodeBracesRangeFlags.MethodBraces;
 			} else if (blockStatement.Parent is Accessor) {
+				flags = CodeBracesRangeFlags.AccessorBraces;
 				if (blockStatement.Parent.Role == PropertyDeclaration.GetterRole) {
 					style = policy.PropertyGetBraceStyle;
-					flags = CodeBracesRangeFlags.MethodBraces;
 				} else if (blockStatement.Parent.Role == PropertyDeclaration.SetterRole) {
 					style = policy.PropertySetBraceStyle;
-					flags = CodeBracesRangeFlags.MethodBraces;
 				} else if (blockStatement.Parent.Role == CustomEventDeclaration.AddAccessorRole) {
 					style = policy.EventAddBraceStyle;
-					flags = CodeBracesRangeFlags.MethodBraces;
 				} else if (blockStatement.Parent.Role == CustomEventDeclaration.RemoveAccessorRole) {
 					style = policy.EventRemoveBraceStyle;
-					flags = CodeBracesRangeFlags.MethodBraces;
 				} else {
 					style = policy.StatementBraceStyle;
-					flags = CodeBracesRangeFlags.OtherBlockBraces;
 				}
 			} else if (blockStatement.Parent is ForeachStatement || blockStatement.Parent is ForStatement ||
 					   blockStatement.Parent is DoWhileStatement || blockStatement.Parent is WhileStatement) {
@@ -1708,6 +1719,15 @@ namespace ICSharpCode.NRefactory.CSharp {
 			} else if (blockStatement.Parent is CatchClause) {
 				style = policy.StatementBraceStyle;
 				flags = CodeBracesRangeFlags.CatchBraces;
+			} else if (blockStatement.Parent is LockStatement) {
+				style = policy.StatementBraceStyle;
+				flags = CodeBracesRangeFlags.LockBraces;
+			} else if (blockStatement.Parent is UsingStatement) {
+				style = policy.StatementBraceStyle;
+				flags = CodeBracesRangeFlags.UsingBraces;
+			} else if (blockStatement.Parent is FixedStatement) {
+				style = policy.StatementBraceStyle;
+				flags = CodeBracesRangeFlags.FixedBraces;
 			} else {
 				style = policy.StatementBraceStyle;
 				flags = CodeBracesRangeFlags.OtherBlockBraces;

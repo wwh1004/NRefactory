@@ -718,6 +718,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			var oldRef = currentMethodReference;
 			currentMethodReference = new object();
 			StartNode(anonymousMethodExpression);
+			var builder = anonymousMethodExpression.Annotation<MethodDebugInfoBuilder>();
+			if (builder != null)
+				builder.StartPosition = writer.GetLocation();
 			if (anonymousMethodExpression.IsAsync) {
 				WriteKeyword(AnonymousMethodExpression.AsyncModifierRole);
 				Space();
@@ -728,6 +731,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 				WriteCommaSeparatedListInParenthesis(anonymousMethodExpression.Parameters, policy.SpaceWithinMethodDeclarationParentheses, CodeBracesRangeFlags.Parentheses);
 			}
 			anonymousMethodExpression.Body.AcceptVisitor(this);
+			if (builder != null && builder.EndPosition == null)
+				builder.EndPosition = writer.GetLocation();
 			currentMethodReference = oldRef;
 			EndNode(anonymousMethodExpression);
 		}
@@ -1067,6 +1072,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(lambdaExpression);
 			var oldRef = currentMethodReference;
 			currentMethodReference = new object();
+			var builder = lambdaExpression.Annotation<MethodDebugInfoBuilder>();
+			if (builder != null)
+				builder.StartPosition = writer.GetLocation();
 			if (lambdaExpression.IsAsync) {
 				WriteKeyword(LambdaExpression.AsyncModifierRole);
 				Space();
@@ -1080,6 +1088,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteToken(LambdaExpression.ArrowRole, BoxedTextColor.Operator);
 			Space();
 			lambdaExpression.Body.AcceptVisitor(this);
+			if (builder != null && builder.EndPosition == null)
+				builder.EndPosition = writer.GetLocation();
 			currentMethodReference = oldRef;
 			EndNode(lambdaExpression);
 		}
@@ -1672,9 +1682,11 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(blockStatement);
 			BraceStyle style;
 			CodeBracesRangeFlags flags;
+			MethodDebugInfoBuilder builder = null;
 			if (blockStatement.Parent is AnonymousMethodExpression || blockStatement.Parent is LambdaExpression) {
 				style = policy.AnonymousMethodBraceStyle;
 				flags = CodeBracesRangeFlags.AnonymousMethodBraces;
+				builder = blockStatement.Parent.Annotation<MethodDebugInfoBuilder>();
 			} else if (blockStatement.Parent is ConstructorDeclaration) {
 				style = policy.ConstructorBraceStyle;
 				flags = CodeBracesRangeFlags.ConstructorBraces;
@@ -1750,6 +1762,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 			EndNode(blockStatement);
 			lastBlockStatementEndOffset = writer.GetLocation() ?? 0;
 			CloseBrace(style, braceHelper, out start, out end, false);
+			if (builder != null)
+				builder.EndPosition = end;
 			if (blockStatement.HiddenEnd != null) {
 				DebugStart(blockStatement, start);
 				DebugHidden(blockStatement.HiddenEnd);
@@ -2296,6 +2310,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitAccessor(Accessor accessor)
 		{
 			StartNode(accessor);
+			var builder = accessor.Annotation<MethodDebugInfoBuilder>();
+			if (builder != null)
+				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(accessor.Attributes);
 			WriteModifiers(accessor.ModifierTokens);
 
@@ -2335,6 +2352,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 			}
 			else
 				WriteMethodBody(accessor.Body);
+			if (builder != null)
+				builder.EndPosition = writer.GetLocation();
 			currentMethodReference = oldRef;
 			EndNode(accessor);
 		}
@@ -2342,6 +2361,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitConstructorDeclaration(ConstructorDeclaration constructorDeclaration)
 		{
 			StartNode(constructorDeclaration);
+			var builder = constructorDeclaration.Annotation<MethodDebugInfoBuilder>();
+			if (builder != null)
+				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(constructorDeclaration.Attributes);
 			WriteModifiers(constructorDeclaration.ModifierTokens);
 			var oldRef = currentMethodReference;
@@ -2360,6 +2382,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 				constructorDeclaration.Initializer.AcceptVisitor(this);
 			}
 			WriteMethodBody(constructorDeclaration.Body);
+			if (builder != null)
+				builder.EndPosition = writer.GetLocation();
 			currentMethodReference = oldRef;
 			EndNode(constructorDeclaration);
 		}
@@ -2384,6 +2408,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitDestructorDeclaration(DestructorDeclaration destructorDeclaration)
 		{
 			StartNode(destructorDeclaration);
+			var builder = destructorDeclaration.Annotation<MethodDebugInfoBuilder>();
+			if (builder != null)
+				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(destructorDeclaration.Attributes);
 			WriteModifiers(destructorDeclaration.ModifierTokens);
 			var oldRef = currentMethodReference;
@@ -2417,6 +2444,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 			var braceHelper = BraceHelper.LeftParen(this, CodeBracesRangeFlags.Parentheses);
 			braceHelper.RightParen();
 			WriteMethodBody(destructorDeclaration.Body);
+			if (builder != null)
+				builder.EndPosition = writer.GetLocation();
 			currentMethodReference = oldRef;
 			EndNode(destructorDeclaration);
 		}
@@ -2570,6 +2599,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitMethodDeclaration(MethodDeclaration methodDeclaration)
 		{
 			StartNode(methodDeclaration);
+			var builder = methodDeclaration.Annotation<MethodDebugInfoBuilder>();
+			if (builder != null)
+				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(methodDeclaration.Attributes);
 			WriteModifiers(methodDeclaration.ModifierTokens);
 			var oldRef = currentMethodReference;
@@ -2590,6 +2622,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 				constraint.AcceptVisitor(this);
 			}
 			WriteMethodBody(methodDeclaration.Body);
+			if (builder != null)
+				builder.EndPosition = writer.GetLocation();
 			currentMethodReference = oldRef;
 			EndNode(methodDeclaration);
 		}
@@ -2597,6 +2631,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitOperatorDeclaration(OperatorDeclaration operatorDeclaration)
 		{
 			StartNode(operatorDeclaration);
+			var builder = operatorDeclaration.Annotation<MethodDebugInfoBuilder>();
+			if (builder != null)
+				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(operatorDeclaration.Attributes);
 			WriteModifiers(operatorDeclaration.ModifierTokens);
 			var oldRef = currentMethodReference;
@@ -2619,6 +2656,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 			Space(policy.SpaceBeforeMethodDeclarationParentheses);
 			WriteCommaSeparatedListInParenthesis(operatorDeclaration.Parameters, policy.SpaceWithinMethodDeclarationParentheses, CodeBracesRangeFlags.Parentheses);
 			WriteMethodBody(operatorDeclaration.Body);
+			if (builder != null)
+				builder.EndPosition = writer.GetLocation();
 			currentMethodReference = oldRef;
 			EndNode(operatorDeclaration);
 		}

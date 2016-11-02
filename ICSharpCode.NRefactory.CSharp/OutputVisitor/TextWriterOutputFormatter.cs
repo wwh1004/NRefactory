@@ -207,7 +207,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			TextWriter writer = new StringWriter();
 			TextWriterTokenWriter tokenWriter = new TextWriterTokenWriter(writer);
-			tokenWriter.WritePrimitiveValue(value, TextColorHelper.GetColor(value));
+			tokenWriter.WritePrimitiveValue(value, CSharpMetadataTextColorProvider.Instance.GetColor(value));
 			return writer.ToString();
 		}
 		
@@ -335,7 +335,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				column += b.Length;
 			} else {
 				s = value.ToString();
-				writer(s, TextColorHelper.GetColor(value));
+				writer(s, CSharpMetadataTextColorProvider.Instance.GetColor(value));
 				column += s.Length;
 			}
 		}

@@ -657,7 +657,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				} else {
 					writer.WriteTokenOperator(Roles.Dot, ".");
 				}
-				writer.WriteIdentifier(ident, TextColorHelper.GetColor(ident.Annotation<object>()));
+				writer.WriteIdentifier(ident, CSharpMetadataTextColorProvider.Instance.GetColor(ident.Annotation<object>()));
 			}
 		}
 		
@@ -1030,7 +1030,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			DebugExpression(identifierExpression);
 			StartNode(identifierExpression);
-			WriteIdentifier(identifierExpression.IdentifierToken, TextColorHelper.GetColor(identifierExpression.IdentifierToken.Annotation<object>()));
+			WriteIdentifier(identifierExpression.IdentifierToken, CSharpMetadataTextColorProvider.Instance.GetColor(identifierExpression.IdentifierToken.Annotation<object>()));
 			WriteTypeArguments(identifierExpression.TypeArguments, CodeBracesRangeFlags.AngleBrackets);
 			EndNode(identifierExpression);
 		}
@@ -1109,7 +1109,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(memberReferenceExpression);
 			memberReferenceExpression.Target.AcceptVisitor(this);
 			WriteToken(Roles.Dot, BoxedTextColor.Operator);
-			WriteIdentifier(memberReferenceExpression.MemberNameToken, TextColorHelper.GetColor(memberReferenceExpression.MemberNameToken.Annotation<object>() ?? memberReferenceExpression.Annotation<object>()));
+			WriteIdentifier(memberReferenceExpression.MemberNameToken, CSharpMetadataTextColorProvider.Instance.GetColor(memberReferenceExpression.MemberNameToken.Annotation<object>() ?? memberReferenceExpression.Annotation<object>()));
 			WriteTypeArguments(memberReferenceExpression.TypeArguments, CodeBracesRangeFlags.AngleBrackets);
 			EndNode(memberReferenceExpression);
 		}
@@ -1191,7 +1191,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(pointerReferenceExpression);
 			pointerReferenceExpression.Target.AcceptVisitor(this);
 			WriteToken(PointerReferenceExpression.ArrowRole, BoxedTextColor.Operator);
-			WriteIdentifier(pointerReferenceExpression.MemberNameToken, TextColorHelper.GetColor(pointerReferenceExpression.MemberNameToken.Annotation<object>()));
+			WriteIdentifier(pointerReferenceExpression.MemberNameToken, CSharpMetadataTextColorProvider.Instance.GetColor(pointerReferenceExpression.MemberNameToken.Annotation<object>()));
 			WriteTypeArguments(pointerReferenceExpression.TypeArguments, CodeBracesRangeFlags.AngleBrackets);
 			EndNode(pointerReferenceExpression);
 		}
@@ -1385,7 +1385,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteKeyword(QueryJoinClause.JoinKeywordRole);
 			queryJoinClause.Type.AcceptVisitor(this);
 			Space();
-			WriteIdentifier(queryJoinClause.JoinIdentifierToken, TextColorHelper.GetColor(queryJoinClause.JoinIdentifierToken.Annotation<object>()));
+			WriteIdentifier(queryJoinClause.JoinIdentifierToken, CSharpMetadataTextColorProvider.Instance.GetColor(queryJoinClause.JoinIdentifierToken.Annotation<object>()));
 			Space();
 			WriteKeyword(QueryJoinClause.InKeywordRole);
 			Space();
@@ -1401,7 +1401,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (queryJoinClause.IsGroupJoin) {
 				Space();
 				WriteKeyword(QueryJoinClause.IntoKeywordRole);
-				WriteIdentifier(queryJoinClause.IntoIdentifierToken, TextColorHelper.GetColor(queryJoinClause.IntoIdentifierToken.Annotation<object>()));
+				WriteIdentifier(queryJoinClause.IntoIdentifierToken, CSharpMetadataTextColorProvider.Instance.GetColor(queryJoinClause.IntoIdentifierToken.Annotation<object>()));
 			}
 			EndNode(queryJoinClause);
 		}
@@ -2370,7 +2370,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			currentMethodReference = new object();
 			TypeDeclaration type = constructorDeclaration.Parent as TypeDeclaration;
 			var method = constructorDeclaration.Annotation<dnlib.DotNet.MethodDef>();
-			var textToken = method == null ? BoxedTextColor.Type : TextColorHelper.GetColor(method.DeclaringType);
+			var textToken = method == null ? BoxedTextColor.Type : CSharpMetadataTextColorProvider.Instance.GetColor(method.DeclaringType);
 			if (type != null && type.Name != constructorDeclaration.Name)
 				WriteIdentifier((Identifier)type.NameToken.Clone(), textToken);
 			else
@@ -2435,7 +2435,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteToken(DestructorDeclaration.TildeRole, BoxedTextColor.Operator);
 			TypeDeclaration type = destructorDeclaration.Parent as TypeDeclaration;
 			var method = destructorDeclaration.Annotation<dnlib.DotNet.MethodDef>();
-			var textToken = method == null ? BoxedTextColor.Type : TextColorHelper.GetColor(method.DeclaringType);
+			var textToken = method == null ? BoxedTextColor.Type : CSharpMetadataTextColorProvider.Instance.GetColor(method.DeclaringType);
 			if (type != null && type.Name != destructorDeclaration.Name)
 				WriteIdentifier((Identifier)type.NameToken.Clone(), textToken);
 			else
@@ -2791,7 +2791,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				// It's the empty string. Don't call WriteIdentifier() since it will write "<<EMPTY_NAME>>"
 			}
 			else
-				WriteIdentifier(simpleType.IdentifierToken, TextColorHelper.GetColor(simpleType.IdentifierToken.Annotation<object>() ?? simpleType.Annotation<object>()));
+				WriteIdentifier(simpleType.IdentifierToken, CSharpMetadataTextColorProvider.Instance.GetColor(simpleType.IdentifierToken.Annotation<object>() ?? simpleType.Annotation<object>()));
 			WriteTypeArguments(simpleType.TypeArguments, CodeBracesRangeFlags.AngleBrackets);
 			EndNode(simpleType);
 		}
@@ -2805,7 +2805,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			} else {
 				WriteToken(Roles.Dot, BoxedTextColor.Operator);
 			}
-			WriteIdentifier(memberType.MemberNameToken, TextColorHelper.GetColor(memberType.MemberNameToken.Annotation<object>() ?? memberType.Annotation<object>()));
+			WriteIdentifier(memberType.MemberNameToken, CSharpMetadataTextColorProvider.Instance.GetColor(memberType.MemberNameToken.Annotation<object>() ?? memberType.Annotation<object>()));
 			WriteTypeArguments(memberType.TypeArguments, CodeBracesRangeFlags.AngleBrackets);
 			EndNode(memberType);
 		}
@@ -2941,7 +2941,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			// Do not call StartNode and EndNode for Identifier, because they are handled by the ITokenWriter.
 			// ITokenWriter assumes that each node processed between a
 			// StartNode(parentNode)-EndNode(parentNode)-pair is a child of parentNode.
-			WriteIdentifier(identifier, TextColorHelper.GetColor(identifier.Annotation<object>()));
+			WriteIdentifier(identifier, CSharpMetadataTextColorProvider.Instance.GetColor(identifier.Annotation<object>()));
 		}
 
 		void IAstVisitor.VisitNullNode(AstNode nullNode)

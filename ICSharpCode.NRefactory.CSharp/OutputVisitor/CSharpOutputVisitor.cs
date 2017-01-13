@@ -2183,6 +2183,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitCatchClause(CatchClause catchClause)
 		{
 			StartNode(catchClause);
+			bool hasWhen = !catchClause.Condition.IsNull;
 			DebugStart(catchClause);
 			WriteKeywordReference(CatchClause.CatchKeywordRole, currentTryReference);
 			if (!catchClause.Type.IsNull) {
@@ -2198,8 +2199,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 				braceHelper.RightParen();
 			}
 			DebugEnd(catchClause);
-			if (!catchClause.Condition.IsNull) {
+			if (hasWhen) {
 				Space();
+				DebugStart(catchClause.Condition);
 				WriteKeywordReference(CatchClause.WhenKeywordRole, currentTryReference);
 				Space(policy.SpaceBeforeIfParentheses);
 				var braceHelper = BraceHelper.LeftParen(this, CodeBracesRangeFlags.Parentheses);
@@ -2207,6 +2209,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				catchClause.Condition.AcceptVisitor(this);
 				Space(policy.SpacesWithinIfParentheses);
 				braceHelper.RightParen();
+				DebugEnd(catchClause.Condition);
 			}
 			catchClause.Body.AcceptVisitor(this);
 			EndNode(catchClause);
@@ -2719,6 +2722,10 @@ namespace ICSharpCode.NRefactory.CSharp {
 				}
 			}
 			CloseBrace(policy.PropertyBraceStyle, braceHelper, true);
+			if (propertyDeclaration.Variables.Any()) {
+				propertyDeclaration.Variables.AcceptVisitor(this);
+				WriteToken(Roles.Semicolon, BoxedTextColor.Punctuation);
+			}
 			NewLine();
 			EndNode(propertyDeclaration);
 		}
@@ -2729,12 +2736,18 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitVariableInitializer(VariableInitializer variableInitializer)
 		{
 			StartNode(variableInitializer);
-			WriteIdentifier(variableInitializer.NameToken);
+			bool ownerIsProp = variableInitializer.Parent is PropertyDeclaration;
+			if (!ownerIsProp)
+				WriteIdentifier(variableInitializer.NameToken);
 			if (!variableInitializer.Initializer.IsNull) {
 				Space(policy.SpaceAroundAssignment);
 				WriteToken(Roles.Assign, BoxedTextColor.Operator);
 				Space(policy.SpaceAroundAssignment);
+				if (ownerIsProp)
+					DebugStart(variableInitializer);
 				variableInitializer.Initializer.AcceptVisitor(this);
+				if (ownerIsProp)
+					DebugEnd(variableInitializer);
 			}
 			EndNode(variableInitializer);
 		}

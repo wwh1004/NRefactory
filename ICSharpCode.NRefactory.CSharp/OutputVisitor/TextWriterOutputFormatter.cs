@@ -325,12 +325,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 //				} else {
 					b.Append(((IFormattable)value).ToString(null, NumberFormatInfo.InvariantInfo));
 //				}
-				if (value is uint || value is ulong) {
+				if (value is uint)
 					b.Append("u");
-				}
-				if (value is long || value is ulong) {
+				else if (value is ulong)
+					b.Append("UL");
+				else if (value is long)
 					b.Append("L");
-				}
 				writer(b.ToString(), BoxedTextColor.Number);
 				column += b.Length;
 			} else {

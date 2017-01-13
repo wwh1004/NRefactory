@@ -23,6 +23,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+using System;
+using System.ComponentModel;
 using ICSharpCode.NRefactory.TypeSystem;
 
 namespace ICSharpCode.NRefactory.CSharp
@@ -36,6 +38,10 @@ namespace ICSharpCode.NRefactory.CSharp
 		
 		public override SymbolKind SymbolKind {
 			get { return SymbolKind.Property; }
+		}
+		
+		public AstNodeCollection<VariableInitializer> Variables {
+			get { return GetChildrenByRole (Roles.Variable); }
 		}
 		
 		/// <summary>
@@ -86,7 +92,8 @@ namespace ICSharpCode.NRefactory.CSharp
 			return o != null && MatchString(this.Name, o.Name)
 				&& this.MatchAttributesAndModifiers(o, match) && this.ReturnType.DoMatch(o.ReturnType, match)
 				&& this.PrivateImplementationType.DoMatch(o.PrivateImplementationType, match)
-				&& this.Getter.DoMatch(o.Getter, match) && this.Setter.DoMatch(o.Setter, match);
+				&& this.Getter.DoMatch(o.Getter, match) && this.Setter.DoMatch(o.Setter, match)
+				&& this.Variables.DoMatch(o.Variables, match);
 		}
 	}
 }

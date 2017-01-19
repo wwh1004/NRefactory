@@ -443,11 +443,13 @@ namespace ICSharpCode.NRefactory.CSharp {
 				WriteToken(Roles.Semicolon, BoxedTextColor.Punctuation);
 				if (node != null)
 					DebugEnd(node);
-				NewLine();
+				if (!HACK_disableSemicolonNewLine)
+					NewLine();
 			}
 			else if (node != null)
 				DebugEnd(node);
 		}
+		bool HACK_disableSemicolonNewLine;
 		
 		/// <summary>
 		/// Writes a space depending on policy.
@@ -482,6 +484,15 @@ namespace ICSharpCode.NRefactory.CSharp {
 			BraceHelper braceHelper;
 			switch (style) {
 				case BraceStyle.DoNotChange:
+					if (!isAtStartOfLine)
+						writer.Space();
+					start = writer.GetLocation();
+					braceHelper = BraceHelper.LeftBrace(this, flags);
+					end = writer.GetLocation();
+					if (!isAtStartOfLine)
+						writer.Space();
+					return braceHelper;
+
 				case BraceStyle.EndOfLine:
 				case BraceStyle.BannerStyle:
 					if (!isAtStartOfLine)
@@ -529,6 +540,13 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			switch (style) {
 				case BraceStyle.DoNotChange:
+					writer.Space();
+					start = writer.GetLocation();
+					braceHelper.RightBrace();
+					SaveDeclarationOffset();
+					end = writer.GetLocation();
+					isAtStartOfLine = false;
+					break;
 				case BraceStyle.EndOfLine:
 				case BraceStyle.EndOfLineWithoutSpace:
 				case BraceStyle.NextLine:
@@ -1483,7 +1501,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			}
 			WriteCommaSeparatedList(attributeSection.Attributes);
 			braceHelper.RightBracket();
-			if (attributeSection.Parent is ParameterDeclaration || attributeSection.Parent is TypeParameterDeclaration) {
+			if (attributeSection.Parent is ParameterDeclaration || attributeSection.Parent is TypeParameterDeclaration || (attributeSection.Parent is Accessor && HACK_disableSemicolonNewLine)) {
 				Space();
 			} else {
 				NewLine();
@@ -2709,19 +2727,28 @@ namespace ICSharpCode.NRefactory.CSharp {
 			Space();
 			WritePrivateImplementationType(propertyDeclaration.PrivateImplementationType);
 			WriteIdentifier(propertyDeclaration.NameToken);
-			var braceHelper = OpenBrace(policy.PropertyBraceStyle, CodeBracesRangeFlags.PropertyBraces);
+			var braceStyle = policy.PropertyBraceStyle;
+			if ((propertyDeclaration.Getter.IsNull || propertyDeclaration.Getter.Body.IsNull) &&
+				(propertyDeclaration.Setter.IsNull || propertyDeclaration.Setter.Body.IsNull)) {
+				braceStyle = BraceStyle.DoNotChange;
+				HACK_disableSemicolonNewLine = true;
+			}
+			var braceHelper = OpenBrace(braceStyle, CodeBracesRangeFlags.PropertyBraces);
 			// output get/set in their original order
-			int count = 0;
+			int count = 0, accessors = 0;
 			foreach (AstNode node in propertyDeclaration.Children) {
 				if (count-- <= 0) {
 					cancellationToken.ThrowIfCancellationRequested();
 					count = CANCEL_CHECK_LOOP_COUNT;
 				}
 				if (node.Role == IndexerDeclaration.GetterRole || node.Role == IndexerDeclaration.SetterRole) {
+					if (accessors++ > 0 && HACK_disableSemicolonNewLine)
+						writer.Space();
 					node.AcceptVisitor(this);
 				}
 			}
-			CloseBrace(policy.PropertyBraceStyle, braceHelper, true);
+			HACK_disableSemicolonNewLine = false;
+			CloseBrace(braceStyle, braceHelper, true);
 			if (propertyDeclaration.Variables.Any()) {
 				propertyDeclaration.Variables.AcceptVisitor(this);
 				WriteToken(Roles.Semicolon, BoxedTextColor.Punctuation);

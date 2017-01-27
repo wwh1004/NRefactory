@@ -42,11 +42,19 @@ namespace ICSharpCode.NRefactory.CSharp {
 		int lastBraceOffset;
 		int lastDeclarationOffset;
 
+		struct MethodRefs {
+			public object MethodReference;
+			public object AwaitReference;
+			public static MethodRefs Create() => new MethodRefs {
+				MethodReference = new object(),
+				AwaitReference = new object(),
+			};
+		}
+		MethodRefs currentMethodRefs;
 		object currentIfReference;
 		object currentLoopReference;// for, foreach, while, do..while
 		object currentSwitchReference;
 		object currentTryReference;
-		object currentMethodReference;
 		object currentBreakReference;// either a loop ref or a switch ref
 		int elseIfStart = -1;
 
@@ -648,7 +656,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			}
 		}
 		
-		protected virtual void WriteModifiers(IEnumerable<CSharpModifierToken> modifierTokens)
+		protected virtual void WriteModifiers(IEnumerable<CSharpModifierToken> modifierTokens, AstNode nextNode)
 		{
 			int count = 0;
 			foreach (CSharpModifierToken modifier in modifierTokens) {
@@ -659,8 +667,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 				modifier.AcceptVisitor(this);
 				writer.Space();
 			}
+			// Needed if there are no modifiers so eg. a keyword (such as 'class') isn't written
+			// before the comment.
+			if (nextNode != null)
+				writer.WriteSpecialsUpToNode(nextNode);
 		}
-		
+
 		protected virtual void WriteQualifiedIdentifier(IEnumerable<Identifier> identifiers)
 		{
 			bool first = true;
@@ -733,14 +745,16 @@ namespace ICSharpCode.NRefactory.CSharp {
 		public virtual void VisitAnonymousMethodExpression(AnonymousMethodExpression anonymousMethodExpression)
 		{
 			DebugExpression(anonymousMethodExpression);
-			var oldRef = currentMethodReference;
-			currentMethodReference = new object();
+			var oldRef = currentMethodRefs;
+			currentMethodRefs = MethodRefs.Create();
 			StartNode(anonymousMethodExpression);
 			var builder = anonymousMethodExpression.Annotation<MethodDebugInfoBuilder>();
 			if (builder != null)
 				builder.StartPosition = writer.GetLocation();
 			if (anonymousMethodExpression.IsAsync) {
+				int start = writer.GetLocation() ?? 0;
 				WriteKeyword(AnonymousMethodExpression.AsyncModifierRole);
+				writer.AddHighlightedKeywordReference(currentMethodRefs.AwaitReference, start, writer.GetLocation() ?? 0);
 				Space();
 			}
 			WriteKeyword(AnonymousMethodExpression.DelegateKeywordRole);
@@ -751,7 +765,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			anonymousMethodExpression.Body.AcceptVisitor(this);
 			if (builder != null && builder.EndPosition == null)
 				builder.EndPosition = writer.GetLocation();
-			currentMethodReference = oldRef;
+			currentMethodRefs = oldRef;
 			EndNode(anonymousMethodExpression);
 		}
 		
@@ -1088,13 +1102,15 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			DebugExpression(lambdaExpression);
 			StartNode(lambdaExpression);
-			var oldRef = currentMethodReference;
-			currentMethodReference = new object();
+			var oldRef = currentMethodRefs;
+			currentMethodRefs = MethodRefs.Create();
 			var builder = lambdaExpression.Annotation<MethodDebugInfoBuilder>();
 			if (builder != null)
 				builder.StartPosition = writer.GetLocation();
 			if (lambdaExpression.IsAsync) {
+				int start = writer.GetLocation() ?? 0;
 				WriteKeyword(LambdaExpression.AsyncModifierRole);
+				writer.AddHighlightedKeywordReference(currentMethodRefs.AwaitReference, start, writer.GetLocation() ?? 0);
 				Space();
 			}
 			if (LambdaNeedsParenthesis(lambdaExpression)) {
@@ -1108,7 +1124,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			lambdaExpression.Body.AcceptVisitor(this);
 			if (builder != null && builder.EndPosition == null)
 				builder.EndPosition = writer.GetLocation();
-			currentMethodReference = oldRef;
+			currentMethodRefs = oldRef;
 			EndNode(lambdaExpression);
 		}
 		
@@ -1287,7 +1303,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			UnaryOperatorType opType = unaryOperatorExpression.Operator;
 			var opSymbol = UnaryOperatorExpression.GetOperatorRole(opType);
 			if (opType == UnaryOperatorType.Await) {
+				int start = writer.GetLocation() ?? 0;
 				WriteKeyword(opSymbol);
+				writer.AddHighlightedKeywordReference(currentMethodRefs.AwaitReference, start, writer.GetLocation() ?? 0);
 			} else if (!(opType == UnaryOperatorType.PostIncrement || opType == UnaryOperatorType.PostDecrement)) {
 				WriteToken(opSymbol, BoxedTextColor.Operator);
 			}
@@ -1513,7 +1531,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(delegateDeclaration);
 			WriteAttributes(delegateDeclaration.Attributes);
-			WriteModifiers(delegateDeclaration.ModifierTokens);
+			WriteModifiers(delegateDeclaration.ModifierTokens, delegateDeclaration.ReturnType);
 			WriteKeyword(Roles.DelegateKeyword);
 			delegateDeclaration.ReturnType.AcceptVisitor(this);
 			Space();
@@ -1563,7 +1581,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(typeDeclaration);
 			WriteAttributes(typeDeclaration.Attributes);
-			WriteModifiers(typeDeclaration.ModifierTokens);
+			WriteModifiers(typeDeclaration.ModifierTokens, typeDeclaration.NameToken);
 			BraceStyle braceStyle;
 			switch (typeDeclaration.ClassType) {
 				case ClassType.Enum:
@@ -1884,7 +1902,10 @@ namespace ICSharpCode.NRefactory.CSharp {
 			currentLoopReference = new object();
 			var oldBreakRef = currentBreakReference;
 			currentBreakReference = currentLoopReference;
+			DebugStart(foreachStatement);
 			WriteKeywordReference(ForeachStatement.ForeachKeywordRole, currentLoopReference);
+			DebugHidden(foreachStatement.HiddenInitializer);
+			DebugEnd(foreachStatement, false);
 			Space(policy.SpaceBeforeForeachParentheses);
 			var braceHelper = BraceHelper.LeftParen(this, CodeBracesRangeFlags.Parentheses);
 			Space(policy.SpacesWithinForeachParentheses);
@@ -1923,18 +1944,23 @@ namespace ICSharpCode.NRefactory.CSharp {
 			Space(policy.SpaceBeforeForParentheses);
 			var braceHelper = BraceHelper.LeftParen(this, CodeBracesRangeFlags.Parentheses);
 			Space(policy.SpacesWithinForParentheses);
-			
+
+			bool emptyForList = !forStatement.Initializers.Any() && !forStatement.Iterators.Any();
+
 			DebugStart(forStatement);
 			WriteCommaSeparatedList(forStatement.Initializers);
-			Space(policy.SpaceBeforeForSemicolon);
+			if (!emptyForList)
+				Space(policy.SpaceBeforeForSemicolon);
 			WriteToken(Roles.Semicolon, BoxedTextColor.Punctuation);
 			DebugEnd(forStatement, false);
-			Space(policy.SpaceAfterForSemicolon);
+			if (!emptyForList)
+				Space(policy.SpaceAfterForSemicolon);
 			
 			DebugStart(forStatement);
 			forStatement.Condition.AcceptVisitor(this);
 			DebugEnd(forStatement, false);
-			Space(policy.SpaceBeforeForSemicolon);
+			if (!emptyForList)
+				Space(policy.SpaceBeforeForSemicolon);
 			WriteToken(Roles.Semicolon, BoxedTextColor.Punctuation);
 			if (forStatement.Iterators.Any()) {
 				Space(policy.SpaceAfterForSemicolon);
@@ -2052,7 +2078,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(returnStatement);
 			DebugStart(returnStatement);
-			WriteKeywordReference(ReturnStatement.ReturnKeywordRole, currentMethodReference);
+			WriteKeywordReference(ReturnStatement.ReturnKeywordRole, currentMethodRefs.MethodReference);
 			if (!returnStatement.Expression.IsNull) {
 				Space();
 				returnStatement.Expression.AcceptVisitor(this);
@@ -2275,7 +2301,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(variableDeclarationStatement);
 			DebugStart(variableDeclarationStatement);
-			WriteModifiers(variableDeclarationStatement.GetChildrenByRole(VariableDeclarationStatement.ModifierRole));
+			WriteModifiers(variableDeclarationStatement.GetChildrenByRole(VariableDeclarationStatement.ModifierRole), variableDeclarationStatement.Type);
 			variableDeclarationStatement.Type.AcceptVisitor(this);
 			Space();
 			WriteCommaSeparatedList(variableDeclarationStatement.Variables);
@@ -2309,7 +2335,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(yieldBreakStatement);
 			DebugStart(yieldBreakStatement);
-			WriteKeywordReferences(YieldBreakStatement.YieldKeywordRole, YieldBreakStatement.BreakKeywordRole, currentMethodReference);
+			WriteKeywordReferences(YieldBreakStatement.YieldKeywordRole, YieldBreakStatement.BreakKeywordRole, currentMethodRefs.MethodReference);
 			SemicolonDebugEnd(yieldBreakStatement);
 			EndNode(yieldBreakStatement);
 		}
@@ -2318,7 +2344,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(yieldReturnStatement);
 			DebugStart(yieldReturnStatement);
-			WriteKeywordReferences(YieldReturnStatement.YieldKeywordRole, YieldReturnStatement.ReturnKeywordRole, currentMethodReference);
+			WriteKeywordReferences(YieldReturnStatement.YieldKeywordRole, YieldReturnStatement.ReturnKeywordRole, currentMethodRefs.MethodReference);
 			Space();
 			yieldReturnStatement.Expression.AcceptVisitor(this);
 			SemicolonDebugEnd(yieldReturnStatement);
@@ -2335,26 +2361,10 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (builder != null)
 				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(accessor.Attributes);
-			WriteModifiers(accessor.ModifierTokens);
+			WriteModifiers(accessor.ModifierTokens, accessor.Body);
 
-			// Writer doesn't write the comment before accessor if nothing has been printed yet.
-			// The following code works with our added comments.
-			if (accessor.Attributes.Count == 0 && !accessor.ModifierTokens.Any()) {
-				int count = 0;
-				foreach (var child in accessor.Children) {
-					if (count-- <= 0) {
-						cancellationToken.ThrowIfCancellationRequested();
-						count = CANCEL_CHECK_LOOP_COUNT;
-					}
-					var cmt = child as Comment;
-					if (cmt == null)
-						break;
-					cmt.AcceptVisitor(this);
-				}
-			}
-
-			var oldRef = currentMethodReference;
-			currentMethodReference = new object();
+			var oldRef = currentMethodRefs;
+			currentMethodRefs = MethodRefs.Create();
 			bool isDefault = accessor.Body.IsNull;
 			if (isDefault)
 				DebugStart(accessor);
@@ -2375,7 +2385,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				WriteMethodBody(accessor.Body);
 			if (builder != null)
 				builder.EndPosition = writer.GetLocation();
-			currentMethodReference = oldRef;
+			currentMethodRefs = oldRef;
 			EndNode(accessor);
 		}
 		
@@ -2386,9 +2396,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (builder != null)
 				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(constructorDeclaration.Attributes);
-			WriteModifiers(constructorDeclaration.ModifierTokens);
-			var oldRef = currentMethodReference;
-			currentMethodReference = new object();
+			WriteModifiers(constructorDeclaration.ModifierTokens, constructorDeclaration.NameToken);
+			var oldRef = currentMethodRefs;
+			currentMethodRefs = MethodRefs.Create();
 			TypeDeclaration type = constructorDeclaration.Parent as TypeDeclaration;
 			var method = constructorDeclaration.Annotation<dnlib.DotNet.MethodDef>();
 			var textToken = method == null ? BoxedTextColor.Type : CSharpMetadataTextColorProvider.Instance.GetColor(method.DeclaringType);
@@ -2405,7 +2415,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteMethodBody(constructorDeclaration.Body);
 			if (builder != null)
 				builder.EndPosition = writer.GetLocation();
-			currentMethodReference = oldRef;
+			currentMethodRefs = oldRef;
 			EndNode(constructorDeclaration);
 		}
 		
@@ -2433,25 +2443,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (builder != null)
 				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(destructorDeclaration.Attributes);
-			WriteModifiers(destructorDeclaration.ModifierTokens);
-			var oldRef = currentMethodReference;
-			currentMethodReference = new object();
-
-			// Writer doesn't write the comment before destructorDeclaration if nothing has been printed yet.
-			// The following code works with our added comments.
-			if (destructorDeclaration.Attributes.Count == 0 && !destructorDeclaration.ModifierTokens.Any()) {
-				int count = 0;
-				foreach (var child in destructorDeclaration.Children) {
-					if (count-- <= 0) {
-						cancellationToken.ThrowIfCancellationRequested();
-						count = CANCEL_CHECK_LOOP_COUNT;
-					}
-					var cmt = child as Comment;
-					if (cmt == null)
-						break;
-					cmt.AcceptVisitor(this);
-				}
-			}
+			WriteModifiers(destructorDeclaration.ModifierTokens, destructorDeclaration.NameToken);
+			var oldRef = currentMethodRefs;
+			currentMethodRefs = MethodRefs.Create();
 
 			WriteToken(DestructorDeclaration.TildeRole, BoxedTextColor.Operator);
 			TypeDeclaration type = destructorDeclaration.Parent as TypeDeclaration;
@@ -2467,7 +2461,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteMethodBody(destructorDeclaration.Body);
 			if (builder != null)
 				builder.EndPosition = writer.GetLocation();
-			currentMethodReference = oldRef;
+			currentMethodRefs = oldRef;
 			EndNode(destructorDeclaration);
 		}
 		
@@ -2475,7 +2469,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(enumMemberDeclaration);
 			WriteAttributes(enumMemberDeclaration.Attributes);
-			WriteModifiers(enumMemberDeclaration.ModifierTokens);
+			WriteModifiers(enumMemberDeclaration.ModifierTokens, enumMemberDeclaration.NameToken);
 			WriteIdentifier(enumMemberDeclaration.NameToken);
 			if (!enumMemberDeclaration.Initializer.IsNull) {
 				Space(policy.SpaceAroundAssignment);
@@ -2491,23 +2485,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(eventDeclaration);
 			WriteAttributes(eventDeclaration.Attributes);
-			WriteModifiers(eventDeclaration.ModifierTokens);
-
-			// Writer doesn't write the comment before eventDeclaration if nothing has been printed yet.
-			// The following code works with our added comments.
-			if (eventDeclaration.Attributes.Count == 0 && !eventDeclaration.ModifierTokens.Any()) {
-				int count = 0;
-				foreach (var child in eventDeclaration.Children) {
-					if (count-- <= 0) {
-						cancellationToken.ThrowIfCancellationRequested();
-						count = CANCEL_CHECK_LOOP_COUNT;
-					}
-					var cmt = child as Comment;
-					if (cmt == null)
-						break;
-					cmt.AcceptVisitor(this);
-				}
-			}
+			WriteModifiers(eventDeclaration.ModifierTokens, eventDeclaration.ReturnType);
 
 			WriteKeyword(EventDeclaration.EventKeywordRole);
 			eventDeclaration.ReturnType.AcceptVisitor(this);
@@ -2522,7 +2500,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(customEventDeclaration);
 			WriteAttributes(customEventDeclaration.Attributes);
-			WriteModifiers(customEventDeclaration.ModifierTokens);
+			WriteModifiers(customEventDeclaration.ModifierTokens, customEventDeclaration.ReturnType);
 			WriteKeyword(CustomEventDeclaration.EventKeywordRole);
 			customEventDeclaration.ReturnType.AcceptVisitor(this);
 			Space();
@@ -2549,7 +2527,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(fieldDeclaration);
 			WriteAttributes(fieldDeclaration.Attributes);
-			WriteModifiers(fieldDeclaration.ModifierTokens);
+			WriteModifiers(fieldDeclaration.ModifierTokens, fieldDeclaration.ReturnType);
 			DebugStart(fieldDeclaration);
 			fieldDeclaration.ReturnType.AcceptVisitor(this);
 			Space();
@@ -2563,7 +2541,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(fixedFieldDeclaration);
 			WriteAttributes(fixedFieldDeclaration.Attributes);
-			WriteModifiers(fixedFieldDeclaration.ModifierTokens);
+			WriteModifiers(fixedFieldDeclaration.ModifierTokens, fixedFieldDeclaration.ReturnType);
 			WriteKeyword(FixedFieldDeclaration.FixedKeywordRole);
 			Space();
 			fixedFieldDeclaration.ReturnType.AcceptVisitor(this);
@@ -2593,7 +2571,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(indexerDeclaration);
 			WriteAttributes(indexerDeclaration.Attributes);
-			WriteModifiers(indexerDeclaration.ModifierTokens);
+			WriteModifiers(indexerDeclaration.ModifierTokens, indexerDeclaration.ReturnType);
 			indexerDeclaration.ReturnType.AcceptVisitor(this);
 			Space();
 			WritePrivateImplementationType(indexerDeclaration.PrivateImplementationType);
@@ -2624,9 +2602,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (builder != null)
 				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(methodDeclaration.Attributes);
-			WriteModifiers(methodDeclaration.ModifierTokens);
-			var oldRef = currentMethodReference;
-			currentMethodReference = new object();
+			var oldRef = currentMethodRefs;
+			currentMethodRefs = MethodRefs.Create();
+			WriteModifiers(methodDeclaration.ModifierTokens, methodDeclaration.ReturnType);
 			methodDeclaration.ReturnType.AcceptVisitor(this);
 			Space();
 			WritePrivateImplementationType(methodDeclaration.PrivateImplementationType);
@@ -2645,7 +2623,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteMethodBody(methodDeclaration.Body);
 			if (builder != null)
 				builder.EndPosition = writer.GetLocation();
-			currentMethodReference = oldRef;
+			currentMethodRefs = oldRef;
 			EndNode(methodDeclaration);
 		}
 		
@@ -2656,9 +2634,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (builder != null)
 				builder.StartPosition = writer.GetLocation();
 			WriteAttributes(operatorDeclaration.Attributes);
-			WriteModifiers(operatorDeclaration.ModifierTokens);
-			var oldRef = currentMethodReference;
-			currentMethodReference = new object();
+			WriteModifiers(operatorDeclaration.ModifierTokens, operatorDeclaration.ReturnType);
+			var oldRef = currentMethodRefs;
+			currentMethodRefs = MethodRefs.Create();
 			if (operatorDeclaration.OperatorType == OperatorType.Explicit) {
 				WriteKeyword(OperatorDeclaration.ExplicitRole);
 			} else if (operatorDeclaration.OperatorType == OperatorType.Implicit) {
@@ -2679,7 +2657,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteMethodBody(operatorDeclaration.Body);
 			if (builder != null)
 				builder.EndPosition = writer.GetLocation();
-			currentMethodReference = oldRef;
+			currentMethodRefs = oldRef;
 			EndNode(operatorDeclaration);
 		}
 		
@@ -2722,7 +2700,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			StartNode(propertyDeclaration);
 			WriteAttributes(propertyDeclaration.Attributes);
-			WriteModifiers(propertyDeclaration.ModifierTokens);
+			WriteModifiers(propertyDeclaration.ModifierTokens, propertyDeclaration.ReturnType);
 			propertyDeclaration.ReturnType.AcceptVisitor(this);
 			Space();
 			WritePrivateImplementationType(propertyDeclaration.PrivateImplementationType);
@@ -2968,9 +2946,17 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			CSharpModifierToken mod = cSharpTokenNode as CSharpModifierToken;
 			if (mod != null) {
+				if (mod.Modifier == Modifiers.Async) {
+					// Needed or comments could be written by WriteKeyword() and the comments
+					// would be highlighted when clicking on 'async'
+					writer.WriteSpecialsUpToNode(cSharpTokenNode);
+				}
+				int start = writer.GetLocation() ?? 0;
 				// ITokenWriter assumes that each node processed between a
 				// StartNode(parentNode)-EndNode(parentNode)-pair is a child of parentNode.
 				WriteKeyword(CSharpModifierToken.GetModifierName(mod.Modifier), cSharpTokenNode.Role);
+				if (mod.Modifier == Modifiers.Async)
+					writer.AddHighlightedKeywordReference(currentMethodRefs.AwaitReference, start, writer.GetLocation() ?? 0);
 			} else {
 				throw new NotSupportedException ("Should never visit individual tokens");
 			}

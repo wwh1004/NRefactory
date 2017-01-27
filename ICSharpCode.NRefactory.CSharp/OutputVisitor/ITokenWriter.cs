@@ -26,7 +26,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 	{
 		public abstract void StartNode(AstNode node);
 		public abstract void EndNode(AstNode node);
-		
+
+		public virtual void WriteSpecialsUpToNode(AstNode node) { }
+
 		/// <summary>
 		/// Writes an identifier.
 		/// </summary>
@@ -156,7 +158,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			decoratedWriter.EndNode(node);
 		}
-		
+
+		public override void WriteSpecialsUpToNode(AstNode node)
+		{
+			decoratedWriter.WriteSpecialsUpToNode(node);
+		}
+
 		public override void WriteIdentifier(Identifier identifier, object data)
 		{
 			decoratedWriter.WriteIdentifier(identifier, data);

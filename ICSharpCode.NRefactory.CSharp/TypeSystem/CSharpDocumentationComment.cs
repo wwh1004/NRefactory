@@ -18,7 +18,6 @@
 
 using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.Documentation;
-using ICSharpCode.NRefactory.Editor;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
 
@@ -28,7 +27,7 @@ namespace ICSharpCode.NRefactory.CSharp.TypeSystem {
 	/// </summary>
 	sealed class CSharpDocumentationComment : DocumentationComment
 	{
-		public CSharpDocumentationComment(ITextSource xmlDoc, ITypeResolveContext context) : base(xmlDoc, context)
+		public CSharpDocumentationComment(string xmlDoc, ITypeResolveContext context) : base(xmlDoc, context)
 		{
 		}
 		
@@ -38,7 +37,7 @@ namespace ICSharpCode.NRefactory.CSharp.TypeSystem {
 				// resolve ID string
 				return base.ResolveCref(cref);
 			}
-			var documentationReference = new CSharpParser().ParseDocumentationReference(cref);
+			var documentationReference = new DocumentationReference();//new CSharpParser().ParseDocumentationReference(cref);
 			var csharpContext = context as CSharpTypeResolveContext;
 			CSharpResolver resolver;
 			if (csharpContext != null) {

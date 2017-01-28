@@ -24,7 +24,6 @@ using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
 using System.Xml;
-using ICSharpCode.NRefactory.Editor;
 using ICSharpCode.NRefactory.TypeSystem;
 
 namespace ICSharpCode.NRefactory.Documentation
@@ -405,7 +404,7 @@ namespace ICSharpCode.NRefactory.Documentation
 		{
 			string xmlDoc = GetDocumentation(IdStringProvider.GetIdString(entity));
 			if (xmlDoc != null) {
-				return new DocumentationComment(new StringTextSource(xmlDoc), new SimpleTypeResolveContext(entity));
+				return new DocumentationComment(xmlDoc, new SimpleTypeResolveContext(entity));
 			} else {
 				return null;
 			}

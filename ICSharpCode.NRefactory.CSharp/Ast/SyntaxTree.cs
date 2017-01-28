@@ -28,9 +28,6 @@ using System;
 using System.Collections.Generic;
 using ICSharpCode.NRefactory.CSharp.TypeSystem;
 using ICSharpCode.NRefactory.TypeSystem;
-using System.Threading;
-using System.IO;
-using ICSharpCode.NRefactory.Editor;
 
 namespace ICSharpCode.NRefactory.CSharp {
 	[Obsolete("CompilationUnit was renamed to SyntaxTree", true)]
@@ -157,34 +154,6 @@ namespace ICSharpCode.NRefactory.CSharp {
 			var v = new TypeSystemConvertVisitor (this.FileName);
 			v.VisitSyntaxTree (this);
 			return v.UnresolvedFile;
-		}
-		
-		public static SyntaxTree Parse (string program, string fileName = "", CompilerSettings settings = null, CancellationToken cancellationToken = default (CancellationToken))
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-			var parser = new CSharpParser (settings);
-			return parser.Parse (program, fileName);
-		}
-		
-		public static SyntaxTree Parse (TextReader reader, string fileName = "", CompilerSettings settings = null, CancellationToken cancellationToken = default (CancellationToken))
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-			var parser = new CSharpParser (settings);
-			return parser.Parse (reader, fileName);
-		}
-		
-		public static SyntaxTree Parse (Stream stream, string fileName = "", CompilerSettings settings = null, CancellationToken cancellationToken = default (CancellationToken))
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-			var parser = new CSharpParser (settings);
-			return parser.Parse (stream, fileName);
-		}
-		
-		public static SyntaxTree Parse (ITextSource textSource, string fileName = "", CompilerSettings settings = null, CancellationToken cancellationToken = default (CancellationToken))
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-			var parser = new CSharpParser (settings);
-			return parser.Parse (textSource, fileName);
 		}
 	}
 }

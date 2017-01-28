@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using ICSharpCode.NRefactory.Documentation;
-using ICSharpCode.NRefactory.Editor;
 using ICSharpCode.NRefactory.TypeSystem;
 using ICSharpCode.NRefactory.TypeSystem.Implementation;
 using ICSharpCode.NRefactory.Utils;
@@ -30,7 +29,7 @@ namespace ICSharpCode.NRefactory.CSharp.TypeSystem
 	/// <summary>
 	/// Represents a file that was parsed and converted for the type system.
 	/// </summary>
-	[Serializable, FastSerializerVersion(TypeSystemConvertVisitor.version)]
+	[Serializable]
 	public class CSharpUnresolvedFile : AbstractFreezable, IUnresolvedFile, IUnresolvedDocumentationProvider
 	{
 		// The 'FastSerializerVersion' attribute on CSharpUnresolvedFile must be incremented when fixing 
@@ -204,9 +203,9 @@ namespace ICSharpCode.NRefactory.CSharp.TypeSystem
 				var context = unresolvedTypeDef.CreateResolveContext(new SimpleTypeResolveContext(resolvedTypeDef));
 				if (resolvedEntity is IMember)
 					context = context.WithCurrentMember((IMember)resolvedEntity);
-				return new CSharpDocumentationComment(new StringTextSource(xmlDoc), context);
+				return new CSharpDocumentationComment(xmlDoc, context);
 			} else {
-				return new DocumentationComment(new StringTextSource(xmlDoc), new SimpleTypeResolveContext(resolvedEntity));
+				return new DocumentationComment(xmlDoc, new SimpleTypeResolveContext(resolvedEntity));
 			}
 		}
 	}

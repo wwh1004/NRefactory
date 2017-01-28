@@ -23,7 +23,7 @@ using ICSharpCode.NRefactory.Utils;
 
 namespace ICSharpCode.NRefactory.CSharp.TypeSystem
 {
-	[Serializable, FastSerializerVersion(TypeSystemConvertVisitor.version)]
+	[Serializable]
 	public class CSharpUnresolvedTypeDefinition : DefaultUnresolvedTypeDefinition
 	{
 		readonly UsingScope usingScope;

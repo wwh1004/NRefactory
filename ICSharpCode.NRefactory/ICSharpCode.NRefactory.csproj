@@ -37,7 +37,7 @@
     <DefineConstants>DEBUG;TRACE;NET_4_5;NET_4_6</DefineConstants>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <StartAction>Project</StartAction>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -46,7 +46,7 @@
     <BaseAddress>465371136</BaseAddress>
     <FileAlignment>4096</FileAlignment>
     <Optimize>True</Optimize>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>TRACE;NET_4_5;NET_4_6</DefineConstants>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>

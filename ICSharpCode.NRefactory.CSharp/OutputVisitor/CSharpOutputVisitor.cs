@@ -191,11 +191,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 		#endregion
 		
 		#region debug statements
-		int preventDebugStart = 0;
 		void DebugStart(AstNode node, int? start = null)
 		{
-			if (++preventDebugStart == 1)
-				writer.DebugStart(node, start);
+			writer.DebugStart(node, start);
 		}
 
 		void DebugStartReference(AstNode node, TokenRole role, object reference, ref int keywordStartIndex)
@@ -231,8 +229,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			if (addSelf)
 				writer.DebugExpression(node);
-			if (--preventDebugStart == 0)
-				writer.DebugEnd(node, end);
+			writer.DebugEnd(node, end);
 		}
 		#endregion
 		

@@ -75,6 +75,11 @@ namespace ICSharpCode.NRefactory.TypeSystem
 		IList<IAttribute> Attributes { get; }
 		
 		/// <summary>
+		/// Gets whether this parameter is a C# 'in' parameter.
+		/// </summary>
+		bool IsIn { get; }
+		
+		/// <summary>
 		/// Gets whether this parameter is a C# 'ref' parameter.
 		/// </summary>
 		bool IsRef { get; }

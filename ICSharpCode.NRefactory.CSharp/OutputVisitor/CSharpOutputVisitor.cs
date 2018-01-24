@@ -1040,16 +1040,19 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(directionExpression);
 			
 			switch (directionExpression.FieldDirection) {
+				case FieldDirection.In:
+					break;
 				case FieldDirection.Out:
 					WriteKeyword(DirectionExpression.OutKeywordRole);
+					Space();
 					break;
 				case FieldDirection.Ref:
 					WriteKeyword(DirectionExpression.RefKeywordRole);
+					Space();
 					break;
 				default:
 					throw new NotSupportedException ("Invalid value for FieldDirection");
 			}
-			Space();
 			directionExpression.Expression.AcceptVisitor(this);
 			
 			EndNode(directionExpression);
@@ -2663,6 +2666,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 			StartNode(parameterDeclaration);
 			WriteAttributes(parameterDeclaration.Attributes);
 			switch (parameterDeclaration.ParameterModifier) {
+				case ParameterModifier.In:
+					WriteKeyword(ParameterDeclaration.InModifierRole);
+					break;
 				case ParameterModifier.Ref:
 					WriteKeyword(ParameterDeclaration.RefModifierRole);
 					break;

@@ -513,9 +513,9 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 					for (int i = 0; i < args.Length; i++) {
 						IParameter param = m.Parameters[i];
 						IType parameterType = param.Type.AcceptVisitor(substitution);
-						if ((param.IsRef || param.IsOut) && parameterType.Kind == TypeKind.ByReference) {
+						if ((param.IsIn || param.IsRef || param.IsOut) && parameterType.Kind == TypeKind.ByReference) {
 							parameterType = ((ByReferenceType)parameterType).ElementType;
-							args[i] = new ByReferenceResolveResult(parameterType, param.IsOut);
+							args[i] = new ByReferenceResolveResult(parameterType, param.IsIn, param.IsRef, param.IsOut);
 						} else {
 							args[i] = new ResolveResult(parameterType);
 						}

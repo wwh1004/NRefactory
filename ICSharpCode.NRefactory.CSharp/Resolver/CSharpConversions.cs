@@ -994,7 +994,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver {
 				if (f.IsImplicitlyTyped) {
 					// If F has an implicitly typed parameter list, D has no ref or out parameters.
 					foreach (IParameter p in d.Parameters) {
-						if (p.IsOut || p.IsRef)
+						if (p.IsIn || p.IsOut || p.IsRef)
 							return Conversion.None;
 					}
 				} else {
@@ -1003,7 +1003,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver {
 					for (int i = 0; i < f.Parameters.Count; i++) {
 						IParameter pD = d.Parameters[i];
 						IParameter pF = f.Parameters[i];
-						if (pD.IsRef != pF.IsRef || pD.IsOut != pF.IsOut)
+						if (pD.IsIn != pF.IsIn || pD.IsRef != pF.IsRef || pD.IsOut != pF.IsOut)
 							return Conversion.None;
 						if (!IdentityConversion(dParamTypes[i], pF.Type))
 							return Conversion.None;
@@ -1047,9 +1047,9 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver {
 			for (int i = 0; i < args.Length; i++) {
 				IParameter param = invoke.Parameters[i];
 				IType parameterType = param.Type;
-				if ((param.IsRef || param.IsOut) && parameterType.Kind == TypeKind.ByReference) {
+				if ((param.IsIn || param.IsRef || param.IsOut) && parameterType.Kind == TypeKind.ByReference) {
 					parameterType = ((ByReferenceType)parameterType).ElementType;
-					args[i] = new ByReferenceResolveResult(parameterType, param.IsOut);
+					args[i] = new ByReferenceResolveResult(parameterType, param.IsIn, param.IsRef, param.IsOut);
 				} else {
 					args[i] = new ResolveResult(parameterType);
 				}
@@ -1109,9 +1109,9 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver {
 				var pm = m.Parameters[firstParameterInM + i];
 				var pd = invoke.Parameters[i];
 				// ret/out must match
-				if (pm.IsRef != pd.IsRef || pm.IsOut != pd.IsOut)
+				if (pm.IsIn != pd.IsIn || pm.IsRef != pd.IsRef || pm.IsOut != pd.IsOut)
 					return false;
-				if (pm.IsRef || pm.IsOut) {
+				if (pm.IsIn || pm.IsRef || pm.IsOut) {
 					// ref/out parameters must have same types
 					if (!pm.Type.Equals(pd.Type))
 						return false;

@@ -29,20 +29,23 @@ namespace ICSharpCode.NRefactory.Semantics
 	/// </summary>
 	public class ByReferenceResolveResult : ResolveResult
 	{
+		public bool IsIn { get; private set; }
 		public bool IsOut { get; private set; }
-		public bool IsRef { get { return !IsOut;} }
+		public bool IsRef { get; private set; }
 		
 		public readonly ResolveResult ElementResult;
 		
-		public ByReferenceResolveResult(ResolveResult elementResult, bool isOut)
-			: this(elementResult.Type, isOut)
+		public ByReferenceResolveResult(ResolveResult elementResult, bool isIn, bool isRef, bool isOut)
+			: this(elementResult.Type, isIn, isRef, isOut)
 		{
 			this.ElementResult = elementResult;
 		}
 		
-		public ByReferenceResolveResult(IType elementType, bool isOut)
+		public ByReferenceResolveResult(IType elementType, bool isIn, bool isRef, bool isOut)
 			: base(new ByReferenceType(elementType))
 		{
+			this.IsIn = isIn;
+			this.IsRef = isRef;
 			this.IsOut = isOut;
 		}
 		

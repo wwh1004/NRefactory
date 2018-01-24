@@ -31,6 +31,7 @@ using dnSpy.Contracts.Text;
 namespace ICSharpCode.NRefactory.CSharp {
 	public enum ParameterModifier {
 		None,
+		In,
 		Ref,
 		Out,
 		Params,
@@ -40,6 +41,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 	public class ParameterDeclaration : AstNode
 	{
 		public static readonly Role<AttributeSection> AttributeRole = EntityDeclaration.AttributeRole;
+		public static readonly TokenRole InModifierRole = new TokenRole("in");
 		public static readonly TokenRole RefModifierRole = new TokenRole("ref");
 		public static readonly TokenRole OutModifierRole = new TokenRole("out");
 		public static readonly TokenRole ParamsModifierRole = new TokenRole("params");

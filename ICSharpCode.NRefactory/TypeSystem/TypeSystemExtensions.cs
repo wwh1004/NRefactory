@@ -237,7 +237,8 @@ namespace ICSharpCode.NRefactory.TypeSystem
 						return new DefaultParameter(
 							Import(compilation, p.Type),
 							p.Name, null, p.Region,
-							null, p.IsRef, p.IsOut, p.IsParams
+							null, p.IsRef, p.IsOut, p.IsParams,
+							isIn: p.IsIn
 						);
 					}
 				case SymbolKind.Namespace:

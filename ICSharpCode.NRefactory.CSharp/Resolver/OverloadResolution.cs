@@ -575,10 +575,10 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver {
 				
 				ByReferenceResolveResult brrr = arguments[i] as ByReferenceResolveResult;
 				if (brrr != null) {
-					if ((brrr.IsOut && !candidate.Parameters[parameterIndex].IsOut) || (brrr.IsRef && !candidate.Parameters[parameterIndex].IsRef))
+					if ((brrr.IsOut && !candidate.Parameters[parameterIndex].IsOut) || (brrr.IsRef && !candidate.Parameters[parameterIndex].IsRef) || (brrr.IsIn && !candidate.Parameters[parameterIndex].IsIn))
 						candidate.AddError(OverloadResolutionErrors.ParameterPassingModeMismatch);
 				} else {
-					if (candidate.Parameters[parameterIndex].IsOut || candidate.Parameters[parameterIndex].IsRef)
+					if (candidate.Parameters[parameterIndex].IsOut || candidate.Parameters[parameterIndex].IsRef || candidate.Parameters[parameterIndex].IsIn)
 						candidate.AddError(OverloadResolutionErrors.ParameterPassingModeMismatch);
 				}
 				IType parameterType = candidate.ParameterTypes[parameterIndex];

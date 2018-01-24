@@ -978,6 +978,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 					// create a dummy parameter
 					IType type = ResolveType(parameterDeclaration.Type);
 					switch (parameterDeclaration.ParameterModifier) {
+						case ParameterModifier.In:
 						case ParameterModifier.Ref:
 						case ParameterModifier.Out:
 							type = new ByReferenceType(type);
@@ -985,6 +986,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 					}
 					return new LocalResolveResult(new DefaultParameter(
 						type, name,
+						isIn: parameterDeclaration.ParameterModifier == ParameterModifier.In,
 						isRef: parameterDeclaration.ParameterModifier == ParameterModifier.Ref,
 						isOut: parameterDeclaration.ParameterModifier == ParameterModifier.Out,
 						isParams: parameterDeclaration.ParameterModifier == ParameterModifier.Params));
@@ -1452,7 +1454,7 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 		{
 			if (resolverEnabled) {
 				ResolveResult rr = Resolve(directionExpression.Expression);
-				return new ByReferenceResolveResult(rr, directionExpression.FieldDirection == FieldDirection.Out);
+				return new ByReferenceResolveResult(rr, isIn: directionExpression.FieldDirection == FieldDirection.In, isRef: directionExpression.FieldDirection == FieldDirection.Ref, isOut: directionExpression.FieldDirection == FieldDirection.Out);
 			} else {
 				ScanChildren(directionExpression);
 				return null;
@@ -1983,12 +1985,13 @@ namespace ICSharpCode.NRefactory.CSharp.Resolver
 			resolver = resolver.WithIsWithinLambdaExpression(true);
 			foreach (var pd in parameterDeclarations) {
 				IType type = ResolveType(pd.Type);
-				if (pd.ParameterModifier == ParameterModifier.Ref || pd.ParameterModifier == ParameterModifier.Out)
+				if (pd.ParameterModifier == ParameterModifier.In || pd.ParameterModifier == ParameterModifier.Ref || pd.ParameterModifier == ParameterModifier.Out)
 					type = new ByReferenceType(type);
 				
 				IParameter p = new DefaultParameter(type, pd.Name,
 				                                    region: MakeRegion(pd),
-				                                    isRef: pd.ParameterModifier == ParameterModifier.Ref,
+													isIn: pd.ParameterModifier == ParameterModifier.In,
+													isRef: pd.ParameterModifier == ParameterModifier.Ref,
 				                                    isOut: pd.ParameterModifier == ParameterModifier.Out);
 				// The parameter declaration must be scanned in the current context (without the new parameter)
 				// in order to be consistent with the context in which we resolved pd.Type.

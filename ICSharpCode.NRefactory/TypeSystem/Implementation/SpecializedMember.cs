@@ -380,7 +380,8 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 					parameters[i] = new DefaultParameter(
 						newType, p.Name, this,
 						p.Region, p.Attributes, p.IsRef, p.IsOut,
-						p.IsParams, p.IsOptional, p.ConstantValue
+						p.IsParams, p.IsOptional, p.ConstantValue,
+						isIn: p.IsIn
 					);
 				}
 				return Array.AsReadOnly(parameters);

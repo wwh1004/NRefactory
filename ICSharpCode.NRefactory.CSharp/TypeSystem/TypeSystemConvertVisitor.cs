@@ -1214,6 +1214,10 @@ namespace ICSharpCode.NRefactory.CSharp.TypeSystem {
 				p.Region = MakeRegion(pd);
 				ConvertAttributes(p.Attributes, pd.Attributes);
 				switch (pd.ParameterModifier) {
+					case ParameterModifier.In:
+						p.IsIn = true;
+						p.Type = interningProvider.Intern(new ByReferenceTypeReference(p.Type));
+						break;
 					case ParameterModifier.Ref:
 						p.IsRef = true;
 						p.Type = interningProvider.Intern(new ByReferenceTypeReference(p.Type));
@@ -1237,7 +1241,7 @@ namespace ICSharpCode.NRefactory.CSharp.TypeSystem {
 			List<ITypeReference> result = new List<ITypeReference>();
 			foreach (ParameterDeclaration pd in parameters) {
 				ITypeReference type = pd.Type.ToTypeReference(NameLookupMode.Type, interningProvider);
-				if (pd.ParameterModifier == ParameterModifier.Ref || pd.ParameterModifier == ParameterModifier.Out)
+				if (pd.ParameterModifier == ParameterModifier.In || pd.ParameterModifier == ParameterModifier.Ref || pd.ParameterModifier == ParameterModifier.Out)
 					type = interningProvider.Intern(new ByReferenceTypeReference(type));
 				result.Add(type);
 			}

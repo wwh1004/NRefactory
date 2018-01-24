@@ -31,7 +31,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 		readonly string name;
 		readonly DomRegion region;
 		readonly IList<IAttribute> attributes;
-		readonly bool isRef, isOut, isParams, isOptional;
+		readonly bool isIn, isRef, isOut, isParams, isOptional;
 		readonly object defaultValue;
 		readonly IParameterizedMember owner;
 		
@@ -46,7 +46,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 		}
 		
 		public DefaultParameter(IType type, string name, IParameterizedMember owner = null, DomRegion region = default(DomRegion), IList<IAttribute> attributes = null,
-		                        bool isRef = false, bool isOut = false, bool isParams = false, bool isOptional = false, object defaultValue = null)
+		                        bool isRef = false, bool isOut = false, bool isParams = false, bool isOptional = false, object defaultValue = null, bool isIn = false)
 		{
 			if (type == null)
 				throw new ArgumentNullException("type");
@@ -57,6 +57,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 			this.owner = owner;
 			this.region = region;
 			this.attributes = attributes;
+			this.isIn = isIn;
 			this.isRef = isRef;
 			this.isOut = isOut;
 			this.isParams = isParams;
@@ -74,6 +75,10 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 		
 		public IList<IAttribute> Attributes {
 			get { return attributes; }
+		}
+		
+		public bool IsIn {
+			get { return isIn; }
 		}
 		
 		public bool IsRef {
@@ -120,6 +125,8 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 		public static string ToString(IParameter parameter)
 		{
 			StringBuilder b = new StringBuilder();
+			if (parameter.IsIn)
+				b.Append("in ");
 			if (parameter.IsRef)
 				b.Append("ref ");
 			if (parameter.IsOut)
@@ -142,7 +149,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 		public ISymbolReference ToReference()
 		{
 			if (owner == null)
-				return new ParameterReference(type.ToTypeReference(), name, region, isRef, isOut, isParams, isOptional, defaultValue);
+				return new ParameterReference(type.ToTypeReference(), name, region, isRef, isOut, isParams, isOptional, defaultValue, isIn);
 			return new OwnedParameterReference(owner.ToReference(), owner.Parameters.IndexOf(this));
 		}
 	}
@@ -175,10 +182,10 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 		readonly ITypeReference type;
 		readonly string name;
 		readonly DomRegion region;
-		readonly bool isRef, isOut, isParams, isOptional;
+		readonly bool isIn, isRef, isOut, isParams, isOptional;
 		readonly object defaultValue;
 		
-		public ParameterReference(ITypeReference type, string name, DomRegion region, bool isRef, bool isOut, bool isParams, bool isOptional, object defaultValue)
+		public ParameterReference(ITypeReference type, string name, DomRegion region, bool isRef, bool isOut, bool isParams, bool isOptional, object defaultValue, bool isIn)
 		{
 			if (type == null)
 				throw new ArgumentNullException("type");
@@ -187,6 +194,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 			this.type = type;
 			this.name = name;
 			this.region = region;
+			this.isIn = isIn;
 			this.isRef = isRef;
 			this.isOut = isOut;
 			this.isParams = isParams;
@@ -196,7 +204,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 
 		public ISymbol Resolve(ITypeResolveContext context)
 		{
-			return new DefaultParameter(type.Resolve(context), name, region: region, isRef: isRef, isOut: isOut, isParams: isParams, isOptional: isOptional, defaultValue: defaultValue);
+			return new DefaultParameter(type.Resolve(context), name, region: region, isRef: isRef, isOut: isOut, isParams: isParams, isOptional: isOptional, defaultValue: defaultValue, isIn: isIn);
 		}
 	}
 }

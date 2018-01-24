@@ -29,6 +29,7 @@ namespace ICSharpCode.NRefactory.CSharp
 	public enum FieldDirection
 	{
 		None,
+		In,
 		Out,
 		Ref
 	}
@@ -44,10 +45,6 @@ namespace ICSharpCode.NRefactory.CSharp
 		public FieldDirection FieldDirection {
 			get;
 			set;
-		}
-		
-		public CSharpTokenNode FieldDirectionToken {
-			get { return FieldDirection == ICSharpCode.NRefactory.CSharp.FieldDirection.Ref ? GetChildByRole (RefKeywordRole) : GetChildByRole (OutKeywordRole); }
 		}
 		
 		public Expression Expression {

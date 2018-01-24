@@ -127,6 +127,11 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 			}
 		}
 		
+		public bool IsIn {
+			get { return HasFlag(0x10); }
+			set { SetFlag(0x10, value); }
+		}
+		
 		public bool IsRef {
 			get { return HasFlag(2); }
 			set { SetFlag(2, value); }
@@ -180,6 +185,8 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 		public override string ToString()
 		{
 			StringBuilder b = new StringBuilder();
+			if (IsIn)
+				b.Append("in ");
 			if (IsRef)
 				b.Append("ref ");
 			if (IsOut)
@@ -210,6 +217,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 					Name = name,
 					Region = region,
 					Attributes = attributes.CreateResolvedAttributes(context),
+					IsIn = this.IsIn,
 					IsRef = this.IsRef,
 					IsOut = this.IsOut,
 					IsParams = this.IsParams
@@ -219,7 +227,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 				var resolvedAttributes = attributes.CreateResolvedAttributes (context);
 				bool isOptional = resolvedAttributes != null && resolvedAttributes.Any (a => IsOptionalAttribute (a.AttributeType));
 				return new DefaultParameter (type.Resolve (context), name, owner, region,
-				                             resolvedAttributes, IsRef, IsOut, IsParams, isOptional);
+				                             resolvedAttributes, IsRef, IsOut, IsParams, isOptional, isIn: IsIn);
 			}
 		}
 		
@@ -240,6 +248,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 			public string Name { get; internal set; }
 			public DomRegion Region { get; internal set; }
 			public IList<IAttribute> Attributes { get; internal set; }
+			public bool IsIn { get; internal set; }
 			public bool IsRef { get; internal set; }
 			public bool IsOut { get; internal set; }
 			public bool IsParams { get; internal set; }
@@ -267,7 +276,7 @@ namespace ICSharpCode.NRefactory.TypeSystem.Implementation
 			public ISymbolReference ToReference()
 			{
 				if (Owner == null)
-					return new ParameterReference(Type.ToTypeReference(), Name, Region, IsRef, IsOut, IsParams, true, ConstantValue);
+					return new ParameterReference(Type.ToTypeReference(), Name, Region, IsRef, IsOut, IsParams, true, ConstantValue, IsIn);
 				return new OwnedParameterReference(Owner.ToReference(), Owner.Parameters.IndexOf(this));
 			}
 		}

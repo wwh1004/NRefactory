@@ -42,7 +42,7 @@ namespace ICSharpCode.NRefactory.Semantics
 			IType type = variable.Type;
 			if (type.Kind == TypeKind.ByReference) {
 				IParameter p = variable as IParameter;
-				if (p != null && (p.IsRef || p.IsOut))
+				if (p != null && (p.IsIn || p.IsRef || p.IsOut))
 					return ((ByReferenceType)type).ElementType;
 			}
 			return type;

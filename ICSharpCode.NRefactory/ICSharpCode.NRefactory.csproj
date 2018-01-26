@@ -31,8 +31,8 @@
     <BaseAddress>465371136</BaseAddress>
     <FileAlignment>4096</FileAlignment>
     <Optimize>False</Optimize>
-    <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;NET_4_5;NET_4_6</DefineConstants>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -50,7 +50,8 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>TRACE;NET_4_5;NET_4_6</DefineConstants>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-    <DebugType>PdbOnly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <OutputPath>..\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>

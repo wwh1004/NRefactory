@@ -2753,6 +2753,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 				Space(policy.SpaceAroundAssignment);
 				if (ownerIsProp)
 					DebugStart(variableInitializer);
+				WriteModifiers(variableInitializer.GetChildrenByRole(VariableInitializer.ModifierRole), null);
 				variableInitializer.Initializer.AcceptVisitor(this);
 				if (ownerIsProp)
 					DebugEnd(variableInitializer);

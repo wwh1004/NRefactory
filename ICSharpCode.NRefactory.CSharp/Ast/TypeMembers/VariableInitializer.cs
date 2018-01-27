@@ -28,6 +28,8 @@ namespace ICSharpCode.NRefactory.CSharp
 {
 	public class VariableInitializer : AstNode
 	{
+		public static readonly Role<CSharpModifierToken> ModifierRole = EntityDeclaration.ModifierRole;
+
 		#region Null
 		public new static readonly VariableInitializer Null = new NullVariableInitializer ();
 		
@@ -123,6 +125,11 @@ namespace ICSharpCode.NRefactory.CSharp
 			if (nameAnnotation != null)
 				this.NameToken.AddAnnotation(nameAnnotation);
 			this.Initializer = initializer;
+		}
+
+		public Modifiers Modifiers {
+			get { return EntityDeclaration.GetModifiers(this); }
+			set { EntityDeclaration.SetModifiers(this, value); }
 		}
 
 		public string Name {

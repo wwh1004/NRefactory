@@ -87,7 +87,8 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			Modifiers oldValue = GetModifiers(node);
 			AstNode insertionPos = node.GetChildrenByRole(AttributeRole).LastOrDefault();
-			foreach (Modifiers m in CSharpModifierToken.AllModifiers) {
+			var modifiers = node is TypeDeclaration ? CSharpModifierToken.TypeModifiers : CSharpModifierToken.AllModifiers;
+			foreach (Modifiers m in modifiers) {
 				if ((m & newValue) != 0) {
 					if ((m & oldValue) == 0) {
 						// Modifier was added

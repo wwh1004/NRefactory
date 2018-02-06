@@ -68,9 +68,23 @@ namespace ICSharpCode.NRefactory.CSharp {
 			Modifiers.Async,
 			Modifiers.Any
 		};
-		
+		static readonly Modifiers[] typeModifiers = {
+			Modifiers.Public, Modifiers.Protected, Modifiers.Private, Modifiers.Internal,
+			Modifiers.New,
+			Modifiers.Unsafe,
+			Modifiers.Abstract, Modifiers.Virtual, Modifiers.Sealed, Modifiers.Static, Modifiers.Override,
+			Modifiers.Readonly, Modifiers.Ref, Modifiers.Volatile,
+			Modifiers.Extern, Modifiers.Partial, Modifiers.Const,
+			Modifiers.Async,
+			Modifiers.Any
+		};
+
 		public static IEnumerable<Modifiers> AllModifiers {
 			get { return allModifiers; }
+		}
+
+		public static IEnumerable<Modifiers> TypeModifiers {
+			get { return typeModifiers; }
 		}
 		
 		public CSharpModifierToken (TextLocation location, Modifiers modifier) : base (location, null)

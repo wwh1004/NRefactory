@@ -177,7 +177,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			// Ensure that nodes are visited in the proper nested order.
 			// Jumps to different subtrees are allowed only for the child of a placeholder node.
-			Debug.Assert(containerStack.Count == 0 || node.Parent == containerStack.Peek() || containerStack.Peek().NodeType == NodeType.Pattern);
+			Debug.Assert(containerStack.Count == 0 || node.Parent == containerStack.Peek() || node == containerStack.Peek() || containerStack.Peek().NodeType == NodeType.Pattern);
 			containerStack.Push(node);
 			writer.StartNode(node);
 		}
@@ -1121,7 +1121,13 @@ namespace ICSharpCode.NRefactory.CSharp {
 			Space();
 			WriteToken(LambdaExpression.ArrowRole, BoxedTextColor.Operator);
 			Space();
+
+			StartNode(lambdaExpression.Body);
+			DebugStart(lambdaExpression.Body);
 			lambdaExpression.Body.AcceptVisitor(this);
+			DebugEnd(lambdaExpression.Body);
+			EndNode(lambdaExpression.Body);
+
 			if (builder != null && builder.EndPosition == null)
 				builder.EndPosition = writer.GetLocation();
 			currentMethodRefs = oldRef;

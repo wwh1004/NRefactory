@@ -1002,6 +1002,12 @@ namespace ICSharpCode.NRefactory.CSharp {
 		{
 			DebugExpression(conditionalExpression);
 			StartNode(conditionalExpression);
+
+			if (conditionalExpression.TrueExpression is DirectionExpression) {
+				WriteKeyword(DirectionExpression.RefKeywordRole);
+				Space();
+			}
+
 			conditionalExpression.Condition.AcceptVisitor(this);
 			
 			Space(policy.SpaceBeforeConditionalOperatorCondition);

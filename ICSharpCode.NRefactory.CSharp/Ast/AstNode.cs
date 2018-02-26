@@ -393,7 +393,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			return new AstNodeCollection<T> (this, role);
 		}
 		
-		protected void SetChildByRole<T> (Role<T> role, T newChild) where T : AstNode
+		public void SetChildByRole<T> (Role<T> role, T newChild) where T : AstNode
 		{
 			AstNode oldChild = GetChildByRole (role);
 			if (oldChild.IsNull)

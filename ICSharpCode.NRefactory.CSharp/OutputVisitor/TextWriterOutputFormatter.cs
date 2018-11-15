@@ -31,6 +31,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 	public class TextWriterTokenWriter : TokenWriter, ILocatable
 	{
 		readonly TextWriter textWriter;
+		readonly int maxStringLength;
 		int indentation;
 		bool needsIndent = true;
 		bool isAtStartOfLine = true;
@@ -47,7 +48,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		public string IndentationString { get; set; }
 		
-		public TextWriterTokenWriter(TextWriter textWriter)
+		public TextWriterTokenWriter(TextWriter textWriter, int maxStringLength = -1)
 		{
 			if (textWriter == null)
 				throw new ArgumentNullException("textWriter");
@@ -55,6 +56,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			this.IndentationString = "\t";
 			this.line = 1;
 			this.column = 1;
+			this.maxStringLength = maxStringLength;
 		}
 		
 		public override void WriteIdentifier(Identifier identifier, object data)
@@ -213,10 +215,10 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		public override void WritePrimitiveValue(object value, object data = null, string literalValue = null)
 		{
-			WritePrimitiveValue(value, data, literalValue, ref column, (a, b) => textWriter.Write(a), WriteToken);
+			WritePrimitiveValue(value, data, literalValue, maxStringLength, ref column, (a, b) => textWriter.Write(a), WriteToken);
 		}
 		
-		public static void WritePrimitiveValue(object value, object data, string literalValue, ref int column, Action<string, object> writer, Action<Role, string, object> writeToken)
+		public static void WritePrimitiveValue(object value, object data, string literalValue, int maxStringLength, ref int column, Action<string, object> writer, Action<Role, string, object> writeToken)
 		{
 			if (literalValue != null) {
 				Debug.Assert(data != null);
@@ -245,7 +247,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 
 			var s = value as string;
 			if (s != null) {
-				string tmp = "\"" + ConvertString(s) + "\"";
+				string tmp = "\"" + ConvertStringMaxLength(s, maxStringLength) + "\"";
 				column += tmp.Length;
 				writer(tmp, BoxedTextColor.String);
 			} else if (value is char) {
@@ -436,10 +438,32 @@ namespace ICSharpCode.NRefactory.CSharp {
 		/// </summary>
 		public static string ConvertString(string str)
 		{
-			int i = 0;
+			return ConvertString(str, 0, str.Length, -1);
+		}
+
+		public static string ConvertStringMaxLength(string str, int maxChars)
+		{
+			return ConvertString(str, 0, str.Length, maxChars);
+		}
+
+		static string ConvertString(string str, int start, int length, int maxChars)
+		{
+			int i = start;
+			bool truncated = false;
+			if (maxChars > 0 && length > maxChars) {
+				length = maxChars;
+				truncated = true;
+			}
+			const string TRUNC_MSG = "[...string is too long...]";
+			int end = start + length;
 			for (; ; i++) {
-				if (i >= str.Length)
+				if (i >= end) {
+					if (start != 0 || end != str.Length)
+						str = str.Substring(start, length);
+					if (truncated)
+						return str + TRUNC_MSG;
 					return str;
+				}
 				char c = str[i];
 				switch (c) {
 				case '"':
@@ -462,9 +486,9 @@ namespace ICSharpCode.NRefactory.CSharp {
 
 escapeChars:
 			StringBuilder sb = new StringBuilder();
-			if (i > 0)
-				sb.Append(str, 0, i);
-			for (; i < str.Length; i++) {
+			if (i > start)
+				sb.Append(str, start, i - start);
+			for (; i < end; i++) {
 				char ch = str[i];
 				if (ch == '"') {
 					sb.Append("\\\"");
@@ -472,6 +496,8 @@ escapeChars:
 					AppendChar(sb, ch);
 				}
 			}
+			if (truncated)
+				sb.Append(TRUNC_MSG);
 			return sb.ToString();
 		}
 		

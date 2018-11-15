@@ -3150,13 +3150,5 @@ namespace ICSharpCode.NRefactory.CSharp {
 			EndNode(documentationReference);
 		}
 		#endregion
-		
-		/// <summary>
-		/// Converts special characters to escape sequences within the given string.
-		/// </summary>
-		public static string ConvertString(string text)
-		{
-			return TextWriterTokenWriter.ConvertString(text);
-		}
 	}
 }

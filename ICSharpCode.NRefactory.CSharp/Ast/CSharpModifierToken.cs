@@ -62,7 +62,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			Modifiers.Public, Modifiers.Private, Modifiers.Protected, Modifiers.Internal,
 			Modifiers.New,
 			Modifiers.Unsafe,
-			Modifiers.Abstract, Modifiers.Virtual, Modifiers.Sealed, Modifiers.Static, Modifiers.Override,
+			Modifiers.Abstract, Modifiers.Virtual, Modifiers.Sealed, Modifiers.Static, Modifiers.Override, Modifiers.ReadonlyMember,
 			Modifiers.Ref, Modifiers.Readonly, Modifiers.Volatile,
 			Modifiers.Extern, Modifiers.Partial, Modifiers.Const,
 			Modifiers.Async,
@@ -72,7 +72,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 			Modifiers.Public, Modifiers.Private, Modifiers.Protected, Modifiers.Internal,
 			Modifiers.New,
 			Modifiers.Unsafe,
-			Modifiers.Abstract, Modifiers.Virtual, Modifiers.Sealed, Modifiers.Static, Modifiers.Override,
+			Modifiers.Abstract, Modifiers.Virtual, Modifiers.Sealed, Modifiers.Static, Modifiers.Override, Modifiers.ReadonlyMember,
 			Modifiers.Readonly, Modifiers.Ref, Modifiers.Volatile,
 			Modifiers.Extern, Modifiers.Partial, Modifiers.Const,
 			Modifiers.Async,
@@ -115,6 +115,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					return "override";
 				case Modifiers.Ref:
 					return "ref";
+				case Modifiers.ReadonlyMember:
 				case Modifiers.Readonly:
 					return "readonly";
 				case Modifiers.Const:
@@ -162,6 +163,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					return "override".Length;
 				case Modifiers.Ref:
 					return "ref".Length;
+				case Modifiers.ReadonlyMember:
 				case Modifiers.Readonly:
 					return "readonly".Length;
 				case Modifiers.Const:

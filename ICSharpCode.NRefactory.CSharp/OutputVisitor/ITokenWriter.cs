@@ -110,16 +110,6 @@ namespace ICSharpCode.NRefactory.CSharp {
 			WriteToken(tokenRole, token, BoxedTextColor.Punctuation);
 		}
 
-		public void WriteTokenBrace(Role tokenRole, string token)
-		{
-			WriteToken(tokenRole, token, BoxedTextColor.Punctuation);
-		}
-
-		public void WriteTokenNumber(Role tokenRole, string token)
-		{
-			WriteToken(tokenRole, token, BoxedTextColor.Number);
-		}
-
 		public virtual void AddHighlightedKeywordReference(object reference, int start, int end)
 		{
 		}

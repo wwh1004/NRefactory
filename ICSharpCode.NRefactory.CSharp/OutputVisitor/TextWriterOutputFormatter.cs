@@ -215,31 +215,31 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		public override void WritePrimitiveValue(object value, object data = null, string literalValue = null)
 		{
-			WritePrimitiveValue(value, data, literalValue, maxStringLength, ref column, (a, b) => textWriter.Write(a), WriteToken);
+			WritePrimitiveValue(value, data, literalValue, maxStringLength, ref column, (a, b, c) => textWriter.Write(a), WriteToken);
 		}
-		
-		public static void WritePrimitiveValue(object value, object data, string literalValue, int maxStringLength, ref int column, Action<string, object> writer, Action<Role, string, object> writeToken)
+
+		public static void WritePrimitiveValue(object value, object data, string literalValue, int maxStringLength, ref int column, Action<string, object, object> writer, Action<Role, string, object> writeToken)
 		{
 			if (literalValue != null) {
 				Debug.Assert(data != null);
-				writer(literalValue, data ?? BoxedTextColor.Text);
+				writer(literalValue, null, data ?? BoxedTextColor.Text);
 				column += literalValue.Length;
 				return;
 			}
 			
 			if (value == null) {
 				// usually NullReferenceExpression should be used for this, but we'll handle it anyways
-				writer("null", BoxedTextColor.Keyword);
+				writer("null", null, BoxedTextColor.Keyword);
 				column += 4;
 				return;
 			}
 			
 			if (value is bool) {
 				if ((bool)value) {
-					writer("true", BoxedTextColor.Keyword);
+					writer("true", null, BoxedTextColor.Keyword);
 					column += 4;
 				} else {
-					writer("false", BoxedTextColor.Keyword);
+					writer("false", null, BoxedTextColor.Keyword);
 					column += 5;
 				}
 				return;
@@ -249,31 +249,31 @@ namespace ICSharpCode.NRefactory.CSharp {
 			if (s != null) {
 				string tmp = "\"" + ConvertStringMaxLength(s, maxStringLength) + "\"";
 				column += tmp.Length;
-				writer(tmp, BoxedTextColor.String);
+				writer(tmp, null, BoxedTextColor.String);
 			} else if (value is char) {
 				string tmp = "'" + ConvertCharLiteral((char)value) + "'";
 				column += tmp.Length;
-				writer(tmp, BoxedTextColor.Char);
+				writer(tmp, null, BoxedTextColor.Char);
 			} else if (value is decimal) {
 				string str = ((decimal)value).ToString(NumberFormatInfo.InvariantInfo) + "m";
 				column += str.Length;
-				writer(str, BoxedTextColor.Number);
+				writer(str, null, BoxedTextColor.Number);
 			} else if (value is float) {
 				float f = (float)value;
 				if (float.IsInfinity(f) || float.IsNaN(f)) {
 					// Strictly speaking, these aren't PrimitiveExpressions;
 					// but we still support writing these to make life easier for code generators.
-					writer("float", BoxedTextColor.Keyword);
+					writer("float", null, BoxedTextColor.Keyword);
 					column += 5;
 					writeToken(Roles.Dot, ".", BoxedTextColor.Operator);
 					if (float.IsPositiveInfinity(f)) {
-						writer("PositiveInfinity", BoxedTextColor.LiteralField);
+						writer("PositiveInfinity", null, BoxedTextColor.LiteralField);
 						column += "PositiveInfinity".Length;
 					} else if (float.IsNegativeInfinity(f)) {
-						writer("NegativeInfinity", BoxedTextColor.LiteralField);
+						writer("NegativeInfinity", null, BoxedTextColor.LiteralField);
 						column += "NegativeInfinity".Length;
 					} else {
-						writer("NaN", BoxedTextColor.LiteralField);
+						writer("NaN", null, BoxedTextColor.LiteralField);
 						column += 3;
 					}
 					return;
@@ -286,23 +286,23 @@ namespace ICSharpCode.NRefactory.CSharp {
 					number = "-" + number;
 				}
 				column += number.Length;
-				writer(number, BoxedTextColor.Number);
+				writer(number, value, BoxedTextColor.Number);
 			} else if (value is double) {
 				double f = (double)value;
 				if (double.IsInfinity(f) || double.IsNaN(f)) {
 					// Strictly speaking, these aren't PrimitiveExpressions;
 					// but we still support writing these to make life easier for code generators.
-					writer("double", BoxedTextColor.Keyword);
+					writer("double", null, BoxedTextColor.Keyword);
 					column += 6;
 					writeToken(Roles.Dot, ".", BoxedTextColor.Operator);
 					if (double.IsPositiveInfinity(f)) {
-						writer("PositiveInfinity", BoxedTextColor.LiteralField);
+						writer("PositiveInfinity", null, BoxedTextColor.LiteralField);
 						column += "PositiveInfinity".Length;
 					} else if (double.IsNegativeInfinity(f)) {
-						writer("NegativeInfinity", BoxedTextColor.LiteralField);
+						writer("NegativeInfinity", null, BoxedTextColor.LiteralField);
 						column += "NegativeInfinity".Length;
 					} else {
-						writer("NaN", BoxedTextColor.LiteralField);
+						writer("NaN", null, BoxedTextColor.LiteralField);
 						column += 3;
 					}
 					return;
@@ -318,7 +318,7 @@ namespace ICSharpCode.NRefactory.CSharp {
 					number += ".0";
 				}
 				column += number.Length;
-				writer(number, BoxedTextColor.Number);
+				writer(number, value, BoxedTextColor.Number);
 			} else if (value is IFormattable) {
 				StringBuilder b = new StringBuilder ();
 //				if (primitiveExpression.LiteralFormat == LiteralFormat.HexadecimalNumber) {
@@ -333,11 +333,11 @@ namespace ICSharpCode.NRefactory.CSharp {
 					b.Append("UL");
 				else if (value is long)
 					b.Append("L");
-				writer(b.ToString(), BoxedTextColor.Number);
+				writer(b.ToString(), value, BoxedTextColor.Number);
 				column += b.Length;
 			} else {
 				s = value.ToString();
-				writer(s, CSharpMetadataTextColorProvider.Instance.GetColor(value));
+				writer(s, null, CSharpMetadataTextColorProvider.Instance.GetColor(value));
 				column += s.Length;
 			}
 		}

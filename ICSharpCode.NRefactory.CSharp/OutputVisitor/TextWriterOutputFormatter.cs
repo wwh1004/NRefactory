@@ -215,10 +215,11 @@ namespace ICSharpCode.NRefactory.CSharp {
 		
 		public override void WritePrimitiveValue(object value, object data = null, string literalValue = null)
 		{
-			WritePrimitiveValue(value, data, literalValue, maxStringLength, ref column, (a, b, c) => textWriter.Write(a), WriteToken);
+			var numberFormatter = NumberFormatter.GetCSharpInstance(hex: false, upper: true);
+			WritePrimitiveValue(value, data, literalValue, maxStringLength, ref column, numberFormatter, (a, b, c) => textWriter.Write(a), WriteToken);
 		}
 
-		public static void WritePrimitiveValue(object value, object data, string literalValue, int maxStringLength, ref int column, Action<string, object, object> writer, Action<Role, string, object> writeToken)
+		public static void WritePrimitiveValue(object value, object data, string literalValue, int maxStringLength, ref int column, NumberFormatter numberFormatter, Action<string, object, object> writer, Action<Role, string, object> writeToken)
 		{
 			if (literalValue != null) {
 				Debug.Assert(data != null);
@@ -320,21 +321,38 @@ namespace ICSharpCode.NRefactory.CSharp {
 				column += number.Length;
 				writer(number, value, BoxedTextColor.Number);
 			} else if (value is IFormattable) {
-				StringBuilder b = new StringBuilder ();
-//				if (primitiveExpression.LiteralFormat == LiteralFormat.HexadecimalNumber) {
-//					b.Append("0x");
-//					b.Append(((IFormattable)val).ToString("x", NumberFormatInfo.InvariantInfo));
-//				} else {
-					b.Append(((IFormattable)value).ToString(null, NumberFormatInfo.InvariantInfo));
-//				}
-				if (value is uint)
-					b.Append("u");
-				else if (value is ulong)
-					b.Append("UL");
-				else if (value is long)
-					b.Append("L");
-				writer(b.ToString(), value, BoxedTextColor.Number);
-				column += b.Length;
+				string valueStr;
+				switch (value) {
+				case int v:
+					valueStr = numberFormatter.Format(v);
+					break;
+				case uint v:
+					valueStr = numberFormatter.Format(v) + "U";
+					break;
+				case long v:
+					valueStr = numberFormatter.Format(v) + "L";
+					break;
+				case ulong v:
+					valueStr = numberFormatter.Format(v) + "UL";
+					break;
+				case byte v:
+					valueStr = numberFormatter.Format(v);
+					break;
+				case ushort v:
+					valueStr = numberFormatter.Format(v);
+					break;
+				case short v:
+					valueStr = numberFormatter.Format(v);
+					break;
+				case sbyte v:
+					valueStr = numberFormatter.Format(v);
+					break;
+				default:
+					valueStr = ((IFormattable)value).ToString(null, NumberFormatInfo.InvariantInfo);
+					break;
+				}
+				writer(valueStr, value, BoxedTextColor.Number);
+				column += valueStr.Length;
 			} else {
 				s = value.ToString();
 				writer(s, null, CSharpMetadataTextColorProvider.Instance.GetColor(value));

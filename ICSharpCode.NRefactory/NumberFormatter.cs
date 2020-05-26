@@ -55,7 +55,7 @@ namespace ICSharpCode.NRefactory {
 
 		public override string Format(sbyte value) {
 			if (value < 0)
-				return "-" + Format((byte)(-value));
+				return "-" + Format(unchecked((byte)(-value)));
 			return Format((byte)value);
 		}
 
@@ -63,7 +63,7 @@ namespace ICSharpCode.NRefactory {
 
 		public override string Format(short value) {
 			if (value < 0)
-				return "-" + Format((ushort)(-value));
+				return "-" + Format(unchecked((ushort)(-value)));
 			return Format((ushort)value);
 		}
 
@@ -71,7 +71,7 @@ namespace ICSharpCode.NRefactory {
 
 		public override string Format(int value) {
 			if (value < 0)
-				return "-" + Format((uint)(-value));
+				return "-" + Format(unchecked((uint)(-value)));
 			return Format((uint)value);
 		}
 
@@ -79,7 +79,7 @@ namespace ICSharpCode.NRefactory {
 
 		public override string Format(long value) {
 			if (value < 0)
-				return "-" + Format((ulong)(-value));
+				return "-" + Format(unchecked((ulong)(-value)));
 			return Format((ulong)value);
 		}
 
